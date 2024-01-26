@@ -1,8 +1,22 @@
+# Spring 2024 ME 7785 Lab 1
+# authors: Jeongwoo Cho, Matthew McKenna
+
 import numpy as np
 import cv2
 
 
 def filter_by_color(img_hsv, lower_bound, upper_bound):
+    """
+    Returns array of contours that fall within a HSV bound given an image. 
+
+    Args:
+        img_hsv (_type_): input image in HSV format
+        lower_bound (_type_): lower HSV bound
+        upper_bound (_type_): upper HSV bound
+
+    Returns:
+        _type_: array of contours
+    """
 
     # apply the color filter and create a mask
     color_mask = cv2.inRange(img_hsv, lower_bound, upper_bound)
@@ -16,6 +30,16 @@ def filter_by_color(img_hsv, lower_bound, upper_bound):
 
 
 def find_largest_contour(contours, min_contour_size=5000):
+    """
+    Given list of contours, finds the contour that is greater than a minimum size, and is the largest.
+
+    Args:
+        contours (_type_): list of contours
+        min_contour_size (int, optional): minimum size of contour. Defaults to 5000.
+
+    Returns:
+        _type_: _description_
+    """
     # find largest contour that meets minimum contour size
     max_contour_size = min_contour_size
     final_contour = None
@@ -29,6 +53,13 @@ def find_largest_contour(contours, min_contour_size=5000):
 
 
 def create_bounding_box(img, final_contour):
+    """
+    Draws bounding box around contour on an image and also writes/prints the centroid of the contour.
+
+    Args:
+        img (_type_): image in RGB format
+        final_contour (_type_): contour that is to be drawn
+    """
     # initialize empty mask and populate with largest contour found
     final_mask = np.zeros(img.shape[:2], dtype=img.dtype)
     if final_contour is not None:
@@ -75,3 +106,4 @@ while(True):
 # When everything done, release the capture
 cap.release()
 cv2.destroyAllWindows()
+
