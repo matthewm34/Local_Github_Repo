@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage
+from geometry_msgs.msg import Point
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 import numpy as np
@@ -29,7 +30,7 @@ class FindObject(Node):
         )
     
         self.img_publisher = self.create_publisher(CompressedImage, '/find_object/labeled_img', 10, image_qos_profile)
-        # self.coord_publisher = self.create_publisher()
+        self.coord_publisher = self.create_publisher(Point, '/find_object/coord', 10, image_qos_profile)
 
 
     def image_label_callback(self, CompressedImage):
@@ -46,15 +47,22 @@ class FindObject(Node):
         # find largest contour based on color, draw box around it, and print centroid
         contours = self.filter_by_color(img_hsv_blurred, lower_hsv, higher_hsv)
         final_contour = self.find_largest_contour(contours, 5000)
-        self.create_bounding_box(img_raw, final_contour)
+        cX, cY = self.create_bounding_box(img_raw, final_contour)
 
+        ## ======= PUBLISHING ========
         # compress the labeled image
         labeled_compressed_img = br.cv2_to_compressed_imgmsg(img_raw)
 
-        # publish labeled image at 'labeled_img' topic
-        msg = CompressedImage()
-        msg.data = labeled_compressed_img
-        self.img_publisher.publish(msg)
+        # publish labeled image at '/find_object/labeled_img' topic
+        msg_img = CompressedImage()
+        msg_img.data = labeled_compressed_img
+        self.img_publisher.publish(msg_img)
+
+        # publish coordinate of contour at '/find_object/coord' topic
+        msg_coord = Point()
+        msg_coord.x = cX
+        msg_coord.y = cY
+        self.coord_publisher.publish(msg_coord)
 
 
     def filter_by_color(img_hsv, lower_bound, upper_bound):
@@ -111,6 +119,9 @@ class FindObject(Node):
         Args:
             img (_type_): image in RGB format
             final_contour (_type_): contour that is to be drawn
+        Returns:
+            cX: X coordinate of the centroid of contour
+            cY: Y coordinate of the centroid of contour
         """
         # initialize empty mask and populate with largest contour found
         final_mask = np.zeros(img.shape[:2], dtype=img.dtype)
@@ -129,8 +140,9 @@ class FindObject(Node):
             # draw centroid on image and print
             cv2.circle(img, (cX, cY), 7, (255, 255, 255), -1)
             cv2.putText(img, f"({cX}. {cY})", (cX - 20, cY - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-            print(f"({cX}. {cY})")
+            # print(f"({cX}. {cY})")
 
+        return cX, cY
 
 
 def main():
