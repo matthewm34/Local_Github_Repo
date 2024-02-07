@@ -35,6 +35,8 @@ class CameraDebugger(Node):
 
 
 def main():
+    print('Running node camera_debugger...')
+
     rclpy.init()
     camera_debugger = CameraDebugger()
 
@@ -47,7 +49,8 @@ def main():
     camera_debugger.destroy_node()
     rclpy.shutdown()
 
+    print('node camera_debugger shutdown')
 
-if __name__ == 'm__main__':
+
+if __name__ == '__main__':
     main()
-    print('testing')

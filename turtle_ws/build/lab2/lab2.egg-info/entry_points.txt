@@ -1,0 +1,3 @@
+[console_scripts]
+camera_debugger = lab2.camera_debugger:main
+
