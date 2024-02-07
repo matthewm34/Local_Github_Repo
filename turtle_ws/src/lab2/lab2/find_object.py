@@ -28,7 +28,7 @@ class FindObject(Node):
             image_qos_profile
         )
     
-        self.publisher = self.create_publisher(CompressedImage, 'find_object/labeled_img', 10, image_qos_profile)
+        self.publisher = self.create_publisher(CompressedImage, '/find_object/labeled_img', 10, image_qos_profile)
 
 
     def image_label_callback(self, CompressedImage):

@@ -23,7 +23,7 @@ class CameraDebugger(Node):
 
         self._image_subscriber = self.create_subscription(
             CompressedImage,
-            'find_object/labeled_img',
+            '/find_object/labeled_img',
             self._image_callback,
             image_qos_profile
         )
