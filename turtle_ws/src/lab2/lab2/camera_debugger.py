@@ -21,6 +21,7 @@ class CameraDebugger(Node):
 		    depth=1
 		)
 
+        # TODO: /image_raw/compressed should be changed to whatever the annotated image is published to
         self._image_subscriber = self.create_subscription(
             CompressedImage,
             '/image_raw/compressed',
