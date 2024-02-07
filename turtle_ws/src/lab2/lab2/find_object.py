@@ -28,7 +28,8 @@ class FindObject(Node):
             image_qos_profile
         )
     
-        self.publisher = self.create_publisher(CompressedImage, '/find_object/labeled_img', 10, image_qos_profile)
+        self.img_publisher = self.create_publisher(CompressedImage, '/find_object/labeled_img', 10, image_qos_profile)
+        # self.coord_publisher = self.create_publisher()
 
 
     def image_label_callback(self, CompressedImage):
@@ -53,7 +54,7 @@ class FindObject(Node):
         # publish labeled image at 'labeled_img' topic
         msg = CompressedImage()
         msg.data = labeled_compressed_img
-        self.publisher.publish(msg)
+        self.img_publisher.publish(msg)
 
 
     def filter_by_color(img_hsv, lower_bound, upper_bound):
@@ -131,3 +132,21 @@ class FindObject(Node):
             print(f"({cX}. {cY})")
 
 
+
+def main():
+    print('Running find_object...')
+
+    rclpy.init()
+    object_finder = FindObject()
+
+    while rclpy.ok():
+        rclpy.spin_once(object_finder)
+
+    object_finder.destroy_node()
+    rclpy.shutdown()
+
+    print('node camera_debugger shutdown')
+
+
+if __name__ == '__main__':
+    main()
