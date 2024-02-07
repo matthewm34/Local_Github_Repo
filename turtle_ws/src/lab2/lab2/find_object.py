@@ -60,8 +60,9 @@ class FindObject(Node):
 
         # publish coordinate of contour at '/find_object/coord' topic
         msg_coord = Point()
-        msg_coord.x = cX
-        msg_coord.y = cY
+        msg_coord.x = float(cX)
+        msg_coord.y = float(cY)
+        msg_coord.z = float(img_raw.shape[1])       # kind of cheating here and sending the image width as z. should technically be a custom msg
         self.coord_publisher.publish(msg_coord)
 
 

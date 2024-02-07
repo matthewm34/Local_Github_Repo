@@ -33,6 +33,7 @@ class RobotRotate(Node):
         # read in the coordinate message from /find_object/coord
         x = msg.x
         y = msg.y
+        width = msg.z
 
         # TODO: create a PID to convert coordinate to rotation
         print(f'{x}, {y}')
