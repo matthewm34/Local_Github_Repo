@@ -128,6 +128,9 @@ class FindObject(Node):
         """
         # initialize empty mask and populate with largest contour found
         final_mask = np.zeros(img.shape[:2], dtype=img.dtype)
+        cX = 0
+        cY = 0
+        
         if final_contour is not None:
             cv2.drawContours(final_mask, [final_contour], 0, (255), -1)
 
