@@ -29,7 +29,7 @@ class FindObject(Node):
             image_qos_profile
         )
     
-        self.img_publisher = self.create_publisher(Image, '/find_object/labeled_img', 10)
+        self.img_publisher = self.create_publisher(CompressedImage, '/find_object/labeled_img', 10)
         self.coord_publisher = self.create_publisher(Point, '/find_object/coord', 10) # does image_qos_profile change anything for a Point?
 
 
@@ -53,11 +53,11 @@ class FindObject(Node):
 
         ## ======= PUBLISHING ========
         # compress the labeled image
-        labeled_compressed_img = br.cv2_to_imgmsg(img_raw, 'bgr8')
+        labeled_compressed_img = br.cv2_to_compressed_imgmsg(img_raw, 'bgr8')
 
         # publish labeled image at '/find_object/labeled_img' topic
-        msg_img = br.cv2_to_imgmsg(np.asarray(img_raw, dtype=np.uint8))
-        self.img_publisher.publish(msg_img)
+        # msg_img = br.cv2_to_imgmsg(np.asarray(img_raw, dtype=np.uint8))
+        self.img_publisher.publish(labeled_compressed_img)
 
         # publish coordinate of contour at '/find_object/coord' topic
         msg_coord = Point()

@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CompressedImage
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 import numpy as np
@@ -30,7 +30,7 @@ class CameraDebugger(Node):
     
     def _image_callback(self, msg):
         br = CvBridge()
-        self._img_BGR = br.imgmsg_to_cv2(msg)
+        self._img_BGR = br.compressed_imgmsg_to_cv2(msg)
 
         cv2.imshow('debug image', self._img_BGR)
         self._user_input = cv2.waitKey(1)
