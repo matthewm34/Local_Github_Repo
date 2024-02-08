@@ -56,8 +56,7 @@ class FindObject(Node):
         labeled_compressed_img = br.cv2_to_imgmsg(img_raw, 'bgr8')
 
         # publish labeled image at '/find_object/labeled_img' topic
-        msg_img = Image()
-        msg_img.data = np.asarray(img_raw, dtype="int32")
+        msg_img = br.cv2_to_imgmsg(np.asarray(img_raw, dtype=np.uint8))
         self.img_publisher.publish(msg_img)
 
         # publish coordinate of contour at '/find_object/coord' topic
