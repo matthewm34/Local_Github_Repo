@@ -89,8 +89,10 @@ while(True):
     img_hsv_blurred = cv2.GaussianBlur(img_hsv, (5, 5), 0)
 
     # lower and higher bound for filtering by color
-    lower_hsv = np.array([0, 175, 20])
-    higher_hsv = np.array([10, 255, 255])
+    # lower_hsv = np.array([0, 175, 20])
+    # higher_hsv = np.array([10, 255, 255])
+    lower_hsv = np.array([74, 40, 100])
+    higher_hsv = np.array([95, 255, 255])
 
     # find largest contour based on color, draw box around it, and print centroid
     contours = filter_by_color(img_hsv_blurred, lower_hsv, higher_hsv)
