@@ -57,7 +57,7 @@ class FindObject(Node):
 
         # publish labeled image at '/find_object/labeled_img' topic
         msg_img = Image()
-        msg_img.data = labeled_compressed_img
+        msg_img.data = img_raw
         self.img_publisher.publish(msg_img)
 
         # publish coordinate of contour at '/find_object/coord' topic
