@@ -50,11 +50,11 @@ class RobotRotate(Node):
 
     def get_rotation(self, x, width):
         # object is on the right
-        if x - width/2 > 10:
-            return 1
+        if x - width/2 > 20:
+            return 0.5
         # object is on the left
-        elif x - width/2 < -10:
-            return -1
+        elif x - width/2 < -20:
+            return -0.5
         else: 
             return 0 
 
