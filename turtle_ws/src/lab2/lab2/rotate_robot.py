@@ -40,7 +40,7 @@ class RobotRotate(Node):
         # print(f'{x}, {y}')
         angular_vel = self.get_rotation(x,width)
         ang_msg = Vector3()
-        ang_msg.z = angular_vel
+        ang_msg.z = float(angular_vel)
 
         # publish motor commands
         msg_twist = Twist()
