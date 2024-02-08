@@ -9,6 +9,6 @@ def generate_launch_description():
         ),
         Node(
             package='lab2',
-            executable='rotate_tobot',
+            executable='rotate_robot',
         )
     ])
