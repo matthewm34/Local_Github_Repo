@@ -9,7 +9,7 @@ def generate_launch_description():
     return LaunchDescription([
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
-                os.path.join(get_package_share_directory('~/dontTouch_ws/turtlebot3/turtlebot3_bringup'),
+                os.path.join(get_package_share_directory('turtlebot3_bringup'),
                             'launch/camera_robot.launch.py')
             )
         ),
