@@ -29,7 +29,7 @@ class FindObject(Node):
             image_qos_profile
         )
     
-        self.img_publisher = self.create_publisher(CompressedImage, '/find_object/labeled_img', 10)
+        self.img_publisher = self.create_publisher(Image, '/find_object/labeled_img', 10)
         self.coord_publisher = self.create_publisher(Point, '/find_object/coord', 10) # does image_qos_profile change anything for a Point?
 
 
