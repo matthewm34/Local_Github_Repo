@@ -29,9 +29,10 @@ class CameraDebugger(Node):
         )
     
     def _image_callback(self, msg):
-        self._imgBGR = msg
-        print('callback_reached')
-        cv2.imshow(self._img_BGR)
+        br = CvBridge()
+        self._img_BGR = br.imgmsg_to_cv2(msg)
+
+        cv2.imshow('debug image', self._img_BGR)
         self._user_input = cv2.waitKey(1)
 
 
