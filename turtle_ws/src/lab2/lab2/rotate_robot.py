@@ -42,7 +42,7 @@ class RobotRotate(Node):
 
         # publish motor commands
         msg_twist = Twist()
-        msg_twist.angular = angular_vel
+        msg_twist.angular = [0, 0, angular_vel]
         self.motor_publisher.publish(msg_twist)
 
 
