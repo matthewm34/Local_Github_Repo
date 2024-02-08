@@ -35,7 +35,7 @@ class FindObject(Node):
 
     def image_label_callback(self, msg):
         br = CvBridge()
-        img_raw = br().compressed_imgmsg_to_cv2(msg, "bgr8")
+        img_raw = br.compressed_imgmsg_to_cv2(msg, "bgr8")
 
         img_hsv = cv2.cvtColor(img_raw, cv2.COLOR_BGR2HSV)
         img_hsv_blurred = cv2.GaussianBlur(img_hsv, (5, 5), 0)
