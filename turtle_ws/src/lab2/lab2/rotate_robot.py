@@ -36,13 +36,25 @@ class RobotRotate(Node):
         width = msg.z
 
         # TODO: create a PID to convert coordinate to rotation
-        print(f'{x}, {y}')
+        # for now we're just gonna rotate a specific speed
+        # print(f'{x}, {y}')
+        angular_vel = self.get_rotation(x,width)
 
         # publish motor commands
         msg_twist = Twist()
-        msg_twist.angular = 0
+        msg_twist.angular = angular_vel
         self.motor_publisher.publish(msg_twist)
 
+
+    def get_rotation(self, x, width):
+        # object is on the right
+        if x - width/2 > 10:
+            return 5
+        # object is on the left
+        elif x - width/2 < -10:
+            return -5
+        else: 
+            return 0 
 
 def main():
     print('Running rotate_robot...')
