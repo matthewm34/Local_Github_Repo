@@ -68,7 +68,7 @@ class FindObject(Node):
         self.coord_publisher.publish(msg_coord)
 
 
-    def filter_by_color(img_hsv, lower_bound, upper_bound):
+    def filter_by_color(self, img_hsv, lower_bound, upper_bound):
         """
         Returns array of contours that fall within a HSV bound given an image. 
 
@@ -92,7 +92,7 @@ class FindObject(Node):
         return contours
 
 
-    def find_largest_contour(contours, min_contour_size=5000):
+    def find_largest_contour(self, contours, min_contour_size=5000):
         """
         Given list of contours, finds the contour that is greater than a minimum size, and is the largest.
 
@@ -115,7 +115,7 @@ class FindObject(Node):
         return final_contour
 
 
-    def create_bounding_box(img, final_contour):
+    def create_bounding_box(self, img, final_contour):
         """
         Draws bounding box around contour on an image and also writes/prints the centroid of the contour.
 
