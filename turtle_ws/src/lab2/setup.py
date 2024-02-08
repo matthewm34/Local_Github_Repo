@@ -20,8 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'camera_debugger = lab2.camera_debugger:main'
-            'find_object = lab2.find_object:main'
+            'camera_debugger = lab2.camera_debugger:main',
+            'find_object = lab2.find_object:main',
             'rotate_robot = lab2.rotate_robot:main'
         ],
     },
