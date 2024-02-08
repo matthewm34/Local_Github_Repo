@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Point, Twist
+from geometry_msgs.msg import Point, Twist, Vector3
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 import numpy as np
@@ -39,20 +39,22 @@ class RobotRotate(Node):
         # for now we're just gonna rotate a specific speed
         # print(f'{x}, {y}')
         angular_vel = self.get_rotation(x,width)
+        ang_msg = Vector3()
+        ang_msg.z = angular_vel
 
         # publish motor commands
         msg_twist = Twist()
-        msg_twist.angular = [0, 0, angular_vel]
+        msg_twist.angular = ang_msg
         self.motor_publisher.publish(msg_twist)
 
 
     def get_rotation(self, x, width):
         # object is on the right
         if x - width/2 > 10:
-            return 5
+            return 1
         # object is on the left
         elif x - width/2 < -10:
-            return -5
+            return -1
         else: 
             return 0 
 
