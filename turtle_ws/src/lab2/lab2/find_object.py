@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import CompressedImage, Image
 from geometry_msgs.msg import Point
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
@@ -53,10 +53,10 @@ class FindObject(Node):
 
         ## ======= PUBLISHING ========
         # compress the labeled image
-        labeled_compressed_img = br.cv2_to_compressed_imgmsg(img_raw)
+        labeled_compressed_img = br.cv2_to_imgmsg(img_raw, 'bgr8')
 
         # publish labeled image at '/find_object/labeled_img' topic
-        msg_img = CompressedImage()
+        msg_img = Image()
         msg_img.data = labeled_compressed_img
         self.img_publisher.publish(msg_img)
 
@@ -130,7 +130,7 @@ class FindObject(Node):
         final_mask = np.zeros(img.shape[:2], dtype=img.dtype)
         cX = 0
         cY = 0
-        
+
         if final_contour is not None:
             cv2.drawContours(final_mask, [final_contour], 0, (255), -1)
 

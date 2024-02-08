@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Image
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 import numpy as np
@@ -22,14 +22,15 @@ class CameraDebugger(Node):
 		)
 
         self._image_subscriber = self.create_subscription(
-            CompressedImage,
+            Image,
             '/find_object/labeled_img',
             self._image_callback,
             image_qos_profile
         )
     
     def _image_callback(self, msg):
-        self._imgBGR = CvBridge().compressed_imgmsg_to_cv2(msg, "bgr8")
+        self._imgBGR = msg
+        print('callback_reached')
         cv2.imshow(self._img_BGR)
         self._user_input = cv2.waitKey(1)
 
