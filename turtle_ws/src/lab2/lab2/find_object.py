@@ -48,7 +48,7 @@ class FindObject(Node):
 
         # find largest contour based on color, draw box around it, and print centroid
         contours = self.filter_by_color(img_hsv_blurred, lower_hsv, higher_hsv)
-        final_contour = self.find_largest_contour(contours, 5000)
+        final_contour = self.find_largest_contour(contours, 1000)
         cX, cY = self.create_bounding_box(img_raw, final_contour)
 
         ## ======= PUBLISHING ========
