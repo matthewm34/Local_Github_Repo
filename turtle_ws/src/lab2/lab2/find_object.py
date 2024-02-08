@@ -49,11 +49,7 @@ class FindObject(Node):
         # find largest contour based on color, draw box around it, and print centroid
         contours = self.filter_by_color(img_hsv_blurred, lower_hsv, higher_hsv)
         final_contour = self.find_largest_contour(contours, 5000)
-        if final_contour == None:
-            cX = 160
-            cY = 0
-        else:
-            cX, cY = self.create_bounding_box(img_raw, final_contour)
+        cX, cY = self.create_bounding_box(img_raw, final_contour)
 
         ## ======= PUBLISHING ========
         # compress the labeled image
@@ -131,7 +127,7 @@ class FindObject(Node):
         """
         # initialize empty mask and populate with largest contour found
         final_mask = np.zeros(img.shape[:2], dtype=img.dtype)
-        cX = 0
+        cX = 160
         cY = 0
 
         if final_contour is not None:
