@@ -53,7 +53,7 @@ class FindObject(Node):
 
         ## ======= PUBLISHING ========
         # compress the labeled image
-        labeled_compressed_img = br.cv2_to_compressed_imgmsg(img_raw, 'bgr8')
+        labeled_compressed_img = br.cv2_to_compressed_imgmsg(img_raw)
 
         # publish labeled image at '/find_object/labeled_img' topic
         # msg_img = br.cv2_to_imgmsg(np.asarray(img_raw, dtype=np.uint8))
