@@ -1,3 +1,6 @@
+# ME 7785 Lab 2
+# Authors: Jeongwoo Cho, Matthew McKenna
+
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch_ros.actions import Node

@@ -1,3 +1,6 @@
+# ME 7785 Lab 2
+# Authors: Jeongwoo Cho, Matthew McKenna
+
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage, Image
