@@ -1,6 +1,9 @@
+# ME 7785 Lab 2
+# Authors: Jeongwoo Cho, Matthew McKenna
+
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import Image, CompressedImage
+from sensor_msgs.msg import CompressedImage
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 import numpy as np
@@ -22,17 +25,15 @@ class CameraDebugger(Node):
 		)
 
         self._image_subscriber = self.create_subscription(
-            Image,
+            CompressedImage,
             '/find_object/labeled_img',
             self._image_callback,
             image_qos_profile
         )
     
     def _image_callback(self, msg):
-        br = CvBridge()
-        self._img_BGR = br.compressed_imgmsg_to_cv2(msg)
-
-        cv2.imshow('debug image', self._img_BGR)
+        self._imgBGR = CvBridge().compressed_imgmsg_to_cv2(msg)
+        cv2.imshow(self._img_BGR)
         self._user_input = cv2.waitKey(1)
 
 
