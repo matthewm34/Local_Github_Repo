@@ -23,7 +23,7 @@ setup(
             'camera_debugger = lab2.camera_debugger:main',
             'find_object = lab2.find_object:main',
             'rotate_robot = lab2.rotate_robot:main',
-            'get_object_range = lab2.get_object_range:main'
+            'get_object_range = lab2.get_object_range:main',
         ],
     },
 )
