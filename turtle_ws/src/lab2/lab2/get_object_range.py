@@ -3,7 +3,8 @@
 
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Point, Twist, Vector3, LaserScan
+from geometry_msgs.msg import Point, Twist, Vector3
+from sensor_msgs.msg import LaserScan #make sure to import laserscan like this
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 import numpy as np
