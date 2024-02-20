@@ -3,7 +3,7 @@
 
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Point, Twist, Vector3
+from geometry_msgs.msg import Point, Twist, Vector3, LaserScan
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 
 import numpy as np
@@ -37,6 +37,7 @@ class GetObjectRange(Node):
 
     def scan_callback(self, msg):
         # read in the coordinate message from /scan'
+        print('Running Callback...')
         print(msg)
 
     #     # TODO: create a PID to convert coordinate to rotation
