@@ -10,6 +10,9 @@ setup.py
 ../../build/lab2/lab2.egg-info/zip-safe
 lab2/__init__.py
 lab2/camera_debugger.py
+lab2/find_object.py
+lab2/get_object_range.py
+lab2/rotate_robot.py
 resource/lab2
 test/test_copyright.py
 test/test_flake8.py

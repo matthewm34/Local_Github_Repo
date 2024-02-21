@@ -1,0 +1,35 @@
+[1.658s] Invoking command in '/home/mjmck34/Local_Github_Repo/turtle_ws/src/lab3': PYTHONPATH=/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/prefix_override:/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab3 build --build-base /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/build install --record /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/install.log --single-version-externally-managed
+[1.961s] running egg_info
+[1.962s] creating ../../build/lab3/lab3.egg-info
+[1.963s] writing ../../build/lab3/lab3.egg-info/PKG-INFO
+[1.963s] writing dependency_links to ../../build/lab3/lab3.egg-info/dependency_links.txt
+[1.963s] writing entry points to ../../build/lab3/lab3.egg-info/entry_points.txt
+[1.963s] writing requirements to ../../build/lab3/lab3.egg-info/requires.txt
+[1.963s] writing top-level names to ../../build/lab3/lab3.egg-info/top_level.txt
+[1.963s] writing manifest file '../../build/lab3/lab3.egg-info/SOURCES.txt'
+[1.965s] reading manifest file '../../build/lab3/lab3.egg-info/SOURCES.txt'
+[1.965s] writing manifest file '../../build/lab3/lab3.egg-info/SOURCES.txt'
+[1.965s] running build
+[1.966s] running build_py
+[1.966s] creating /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/build
+[1.966s] creating /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/build/lib
+[1.969s] creating /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/build/lib/lab3
+[1.969s] copying lab3/__init__.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/build/lib/lab3
+[1.970s] running install
+[1.988s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[1.988s] running install_lib
+[1.988s]   warnings.warn(
+[1.991s] creating /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/lib/python3.10/site-packages/lab3
+[1.991s] copying /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/build/lib/lab3/__init__.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/lib/python3.10/site-packages/lab3
+[2.009s] byte-compiling /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/lib/python3.10/site-packages/lab3/__init__.py to __init__.cpython-310.pyc
+[2.009s] running install_data
+[2.009s] creating /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/share/ament_index
+[2.010s] creating /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/share/ament_index/resource_index
+[2.010s] creating /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/share/ament_index/resource_index/packages
+[2.013s] copying resource/lab3 -> /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/share/ament_index/resource_index/packages
+[2.014s] copying package.xml -> /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/share/lab3
+[2.014s] running install_egg_info
+[2.014s] Copying ../../build/lab3/lab3.egg-info to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/lib/python3.10/site-packages/lab3-0.0.0-py3.10.egg-info
+[2.015s] running install_scripts
+[2.038s] writing list of installed files to '/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/install.log'
+[2.071s] Invoked command in '/home/mjmck34/Local_Github_Repo/turtle_ws/src/lab3' returned '0': PYTHONPATH=/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/prefix_override:/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab3/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab3 build --build-base /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/build install --record /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab3/install.log --single-version-externally-managed
