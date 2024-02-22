@@ -33,7 +33,7 @@ class CameraDebugger(Node):
     
     def _image_callback(self, msg):
         self._imgBGR = CvBridge().compressed_imgmsg_to_cv2(msg)
-        cv2.imshow(self._img_BGR)
+        cv2.imshow('test',self._imgBGR)
         self._user_input = cv2.waitKey(1)
 
 

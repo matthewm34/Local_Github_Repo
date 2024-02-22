@@ -10,9 +10,9 @@ setup.py
 ../../build/lab3/lab3.egg-info/zip-safe
 lab3/__init__.py
 lab3/camera_debugger.py
+lab3/chase_object.py
 lab3/find_object.py
 lab3/get_object_range.py
-lab3/rotate_robot.py
 resource/lab3
 test/test_copyright.py
 test/test_flake8.py
