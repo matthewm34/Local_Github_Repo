@@ -45,7 +45,7 @@ class FindObject(Node):
 
         # lower and higher bound for filtering by color
         lower_hsv = np.array([95, 155, 20])
-        higher_hsv = np.array([130, 255, 255])
+        higher_hsv = np.array([150, 255, 255])
         # lower_hsv = np.array([74, 40, 100]) #Matthew: just changed the color thresholding from red to green
         # higher_hsv = np.array([95, 255, 255])
 
