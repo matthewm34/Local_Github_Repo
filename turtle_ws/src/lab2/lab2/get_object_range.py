@@ -16,6 +16,8 @@ class GetObjectRange(Node):
         super().__init__("get_object_range")
 
         self.lidar_data = []
+        self.lidar_angles = []
+        self.lidar_deg_inc = None
 
         #Set up QoS Profiles for passing images over WiFi
         image_qos_profile = QoSProfile(
@@ -48,26 +50,34 @@ class GetObjectRange(Node):
         # read in the coordinate message from /scan'
         # Notes: the lidar scans CCW starting from the robots heading
         lidar_range_raw = msg.ranges #get LIDAR values
+        lidar_range_min = msg.range_min
+        lidar_range_max = msg.range_max
+        angle_increment = msg.angle_increment
+        angle_min = msg.angle_min  
+        angle_max = msg.angle_max  
 
         # print("\n\n\LIDAR RANGE\n\n\n\n" + str(lidar_range_raw))
         lidar_range_data = np.array(lidar_range_raw)
-
-        lidar_range_min = msg.range_min
-        lidar_range_max= msg.range_max
-        
-        angle_increment = msg.angle_increment  
-        angle_min = msg.angle_min  
-        angle_max = msg.angle_max  
-        lidar_angle_data_rad = np.arange(angle_min, angle_max, angle_increment)
+        lidar_angles = np.arange(angle_min, angle_max, angle_increment) * 180/np.pi
 
         angle_increment_deg = angle_increment * 180/np.pi
-        ind_window = np.floor(31.1 / angle_increment_deg)
+        self.lidar_deg_inc = angle_increment_deg
+        ind_window = int(np.floor(31.1 / angle_increment_deg))
+
+        # actual LIDAR data segmented
         lidar_left = lidar_range_data[ind_window:0:-1]
         lidar_right = lidar_range_data[:-ind_window:-1]
-        
-        masked_lidar = np.concatenate((lidar_left,np.array(lidar_range_data[0],lidar_right)))
+
+        # the angles associated with the above LIDAR data 
+        lidar_angles_left = lidar_angles[ind_window:0:-1]
+        lidar_angles_right = lidar_angles[:-ind_window:-1]-360
+
+        # combine the segmented out LIDAR data together
+        masked_lidar = np.concatenate((lidar_left,[lidar_range_data[0]],lidar_right),axis=0)
+        masked_lidar_angles = np.concatenate((lidar_angles_left,[lidar_angles[0]],lidar_angles_right),axis=0)
 
         self.lidar_data = masked_lidar
+        self.lidar_angles = masked_lidar_angles
 
         # get the lhs and rhs robot lidar data for angle
         # lidar_lhs_robot_mask = lidar_angle_data_rad < 31.1*np.pi/180
@@ -110,7 +120,7 @@ class GetObjectRange(Node):
         y = msg.y
         width = msg.z
 
-        #the angle error in radians
+        # the angle error in radians
         theta_error_rad = (width/2-x) * (62.2/width) * ((np.pi)/180)
         # Here the error is + on the RHS from robot's POV and - for LHS
 
@@ -118,7 +128,15 @@ class GetObjectRange(Node):
         msg_rot.z = float(theta_error_rad)
         self.ang_publisher.publish(msg_rot)
 
+        ## DISTANCE CALCULATION
+        # find the index closest to our error angle
+        closest_ind = np.argmin(np.abs(self.lidar_angles - theta_error_rad))
+        distance = self.lidar_data[closest_ind]
 
+        msg_dist = Point()
+        msg_dist.z = float(distance)
+        self.dist_publisher.publish(msg_dist)
+        
 
 def main():
     print('Running get_object_range...')
