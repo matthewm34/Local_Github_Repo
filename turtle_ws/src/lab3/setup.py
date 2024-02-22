@@ -22,7 +22,6 @@ setup(
         'console_scripts': [
             'camera_debugger = lab3.camera_debugger:main',
             'find_object = lab3.find_object:main',
-            'rotate_robot = lab3.rotate_robot:main',
             'get_object_range = lab3.get_object_range:main',
         ],
     },

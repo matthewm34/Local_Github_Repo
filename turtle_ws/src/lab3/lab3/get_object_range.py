@@ -15,6 +15,10 @@ class GetObjectRange(Node):
     def __init__(self):
         super().__init__("get_object_range")
 
+        self.lidar_data = []
+        self.lidar_angles = []
+        self.lidar_deg_inc = None
+
         #Set up QoS Profiles for passing images over WiFi
         image_qos_profile = QoSProfile(
 		    reliability=QoSReliabilityPolicy.BEST_EFFORT,
@@ -31,56 +35,112 @@ class GetObjectRange(Node):
             image_qos_profile
         )
         
+        self.coord_subscriber = self.create_subscription(
+            Point,
+            '/find_object/coord',
+            self.coord_callback,
+            image_qos_profile
+        )
+
         self.dist_publisher = self.create_publisher(Point, '/get_object_range/object_distance', 10) # create publiher for the object distance
         self.ang_publisher = self.create_publisher(Point, '/get_object_range/object_angular_position', 10) # create publiher for the object angle
 
-    i = 1
 
     def scan_callback(self, msg):
         # read in the coordinate message from /scan'
-        print('Running Callback...')
-        
-        lidar_range_data = msg.ranges #get LIDAR values
-        print("\n\n\LIDAR RANGE\n\n\n\n" + str(lidar_range_data))
-        
+        # Notes: the lidar scans CCW starting from the robots heading
+        lidar_range_raw = msg.ranges #get LIDAR values
         lidar_range_min = msg.range_min
-        lidar_range_max= msg.range_max
-        lidar_range_min_vec = np.ones(len(lidar_range_data)) * lidar_range_min
-        lidar_range_max_vec = np.ones(len(lidar_range_data)) * lidar_range_max
+        lidar_range_max = msg.range_max
+        angle_increment = msg.angle_increment
+        angle_min = msg.angle_min  
+        angle_max = msg.angle_max  
 
-        #filter out values values above and below the designated LIDAR distances thresholds
-        lidar_mask = np.logical_and(lidar_range_data > lidar_range_min_vec, lidar_range_data < lidar_range_max_vec)
+        # print("\n\n\LIDAR RANGE\n\n\n\n" + str(lidar_range_raw))
+        lidar_range_data = np.array(lidar_range_raw)
+        lidar_angles = np.arange(angle_min, angle_max, angle_increment) * 180/np.pi
+
+
+        print(len(lidar_range_raw))
+        print(len(lidar_angles))
+
+        angle_increment_deg = angle_increment * 180/np.pi
+        self.lidar_deg_inc = angle_increment_deg
+        ind_window = int(np.floor(31.1 / angle_increment_deg))
+
+        # actual LIDAR data segmented
+        lidar_left = lidar_range_data[ind_window:0:-1]
+        lidar_right = lidar_range_data[:-ind_window:-1]
+
+        # the angles associated with the above LIDAR data 
+        lidar_angles_left = lidar_angles[ind_window:0:-1]
+        lidar_angles_right = lidar_angles[:-ind_window:-1]-360
+
+        # combine the segmented out LIDAR data together
+        masked_lidar = np.concatenate((lidar_left,[lidar_range_data[0]],lidar_right),axis=0)
+        masked_lidar_angles = np.concatenate((lidar_angles_left,[lidar_angles[0]],lidar_angles_right),axis=0)
+
+        self.lidar_data = masked_lidar
+        self.lidar_angles = masked_lidar_angles
+
+        # get the lhs and rhs robot lidar data for angle
+        # lidar_lhs_robot_mask = lidar_angle_data_rad < 31.1*np.pi/180
+        # angle_lhs_robot = lidar_angle_data_rad[lidar_lhs_robot_mask]
+        # angle_lhs_robot = np.flip(angle_lhs_robot)
+
+        # lidar_rhs_robot_mask = lidar_angle_data_rad > (360-31.1)*np.pi/180
+        # angle_rhs_robot = lidar_angle_data_rad[lidar_rhs_robot_mask]
+        # angle_rhs_robot = np.flip(angle_rhs_robot)
+
+        # angle_robot_rad = np.append(angle_lhs_robot, angle_rhs_robot)
+
+        # # get the lhs and rhs robot lidar data for distance
+        # dist_lhs_robot = lidar_range_data[lidar_lhs_robot_mask]
+        # dist_lhs_robot = np.flip(dist_lhs_robot)
+
+        # dist_rhs_robot = lidar_range_data[lidar_rhs_robot_mask]
+        # dist_rhs_robot = np.flip(dist_lhs_robot)
+
+        # dist_robot = np.append(dist_lhs_robot, dist_rhs_robot)
+
+        # #filter out values NAN; also filter above and below the designated LIDAR distances thresholds
+        # lidar_mask = np.logical_and(lidar_range_data > lidar_range_min, lidar_range_data < lidar_range_max)
        
-        lidar_range_data = lidar_range_data(lidar_mask) 
+        # lidar_range_data_masked = lidar_range_data[lidar_mask] 
+        # lidar_radians_vec_masked = lidar_angle_data_rad[lidar_mask] 
+
+        # lidar_angle_data_rad = lidar_range_data_masked
+        # lidar_range_data = lidar_radians_vec_masked
+
+
+        # print(len(angle_robot_rad), len(dist_robot))
+        # print(len(angle_lhs_robot), len(angle_rhs_robot), len(dist_lhs_robot), len(dist_rhs_robot))
+        # print(any(np.isnan(angle_lhs_robot)), any(np.isnan(angle_rhs_robot)), any(np.isnan(dist_lhs_robot)), any(np.isnan(dist_rhs_robot)))
+    
+
+    def coord_callback(self, msg):
+        # read in the pixel coordinate message from /find_object/coord
+        x = msg.x
+        y = msg.y
+        width = msg.z
+
+        # the angle error in radians
+        theta_error_rad = (width/2-x) * (62.2/width) * ((np.pi)/180)
+        # Here the error is + on the RHS from robot's POV and - for LHS
+
+        msg_rot = Point()
+        msg_rot.z = float(theta_error_rad)
+        self.ang_publisher.publish(msg_rot)
+
+        ## DISTANCE CALCULATION
+        # find the index closest to our error angle
+        closest_ind = np.argmin(np.abs(self.lidar_angles - theta_error_rad))
+        distance = self.lidar_data[closest_ind]
+
+        msg_dist = Point()
+        msg_dist.z = float(distance)
+        self.dist_publisher.publish(msg_dist)
         
-        print("\n\n\LIDAR RANGE FILTERED\n\n\n\n" + str(lidar_range_data))
-
-
-
-    #     # TODO: create a PID to convert coordinate to rotation
-    #     # for now we're just gonna rotate a specific speed
-    #     # print(f'{x}, {y}')
-    #     angular_vel = self.get_rotation(x,width)
-    #     ang_msg = Vector3()
-    #     ang_msg.z = float(angular_vel)
-
-    #     # publish motor commands
-    #     msg_twist = Twist()
-    #     msg_twist.angular = ang_msg
-    #     self.motor_publisher.publish(msg_twist)
-
-
-    # def get_rotation(self, x, width):
-    #     # object is on the right
-    #     if x - width/2 > 20:
-    #         print('object on right')
-    #         return -0.5
-    #     # object is on the left
-    #     elif x - width/2 < -20:
-    #         print('object on left')
-    #         return +0.5
-    #     else: 
-    #         return 0 
 
 def main():
     print('Running get_object_range...')
