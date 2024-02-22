@@ -15,6 +15,8 @@ class GetObjectRange(Node):
     def __init__(self):
         super().__init__("get_object_range")
 
+        self.lidar_data = []
+
         #Set up QoS Profiles for passing images over WiFi
         image_qos_profile = QoSProfile(
 		    reliability=QoSReliabilityPolicy.BEST_EFFORT,
@@ -31,8 +33,6 @@ class GetObjectRange(Node):
             image_qos_profile
         )
         
-
-        #Subscriber to LIDAR scan
         self.coord_subscriber = self.create_subscription(
             Point,
             '/find_object/coord',
@@ -60,41 +60,49 @@ class GetObjectRange(Node):
         angle_max = msg.angle_max  
         lidar_angle_data_rad = np.arange(angle_min, angle_max, angle_increment)
 
+        angle_increment_deg = angle_increment * 180/np.pi
+        ind_window = np.floor(31.1 / angle_increment_deg)
+        lidar_left = lidar_range_data[ind_window:0:-1]
+        lidar_right = lidar_range_data[:-ind_window:-1]
+        
+        masked_lidar = np.concatenate((lidar_left,np.array(lidar_range_data[0],lidar_right)))
+
+        self.lidar_data = masked_lidar
+
         # get the lhs and rhs robot lidar data for angle
-        lidar_lhs_robot_mask = lidar_angle_data_rad < 31.1*np.pi/180
-        angle_lhs_robot = lidar_angle_data_rad[lidar_lhs_robot_mask]
-        angle_lhs_robot = np.flip(angle_lhs_robot)
+        # lidar_lhs_robot_mask = lidar_angle_data_rad < 31.1*np.pi/180
+        # angle_lhs_robot = lidar_angle_data_rad[lidar_lhs_robot_mask]
+        # angle_lhs_robot = np.flip(angle_lhs_robot)
 
-        lidar_rhs_robot_mask = lidar_angle_data_rad > (360-31.1)*np.pi/180
-        angle_rhs_robot = lidar_angle_data_rad[lidar_rhs_robot_mask]
-        angle_rhs_robot = np.flip(angle_rhs_robot)
+        # lidar_rhs_robot_mask = lidar_angle_data_rad > (360-31.1)*np.pi/180
+        # angle_rhs_robot = lidar_angle_data_rad[lidar_rhs_robot_mask]
+        # angle_rhs_robot = np.flip(angle_rhs_robot)
 
-        angle_robot_rad = np.append(angle_lhs_robot, angle_rhs_robot)
+        # angle_robot_rad = np.append(angle_lhs_robot, angle_rhs_robot)
 
-        # get the lhs and rhs robot lidar data for distance
-        dist_lhs_robot = lidar_range_data[lidar_lhs_robot_mask]
-        dist_lhs_robot = np.flip(dist_lhs_robot)
+        # # get the lhs and rhs robot lidar data for distance
+        # dist_lhs_robot = lidar_range_data[lidar_lhs_robot_mask]
+        # dist_lhs_robot = np.flip(dist_lhs_robot)
 
-        dist_rhs_robot = lidar_range_data[lidar_rhs_robot_mask]
-        dist_rhs_robot = np.flip(dist_lhs_robot)
+        # dist_rhs_robot = lidar_range_data[lidar_rhs_robot_mask]
+        # dist_rhs_robot = np.flip(dist_lhs_robot)
 
-        dist_robot = np.append(dist_lhs_robot, dist_rhs_robot)
+        # dist_robot = np.append(dist_lhs_robot, dist_rhs_robot)
 
-        #filter out values NAN; also filter above and below the designated LIDAR distances thresholds
-        lidar_mask = np.logical_and(lidar_range_data > lidar_range_min, lidar_range_data < lidar_range_max)
+        # #filter out values NAN; also filter above and below the designated LIDAR distances thresholds
+        # lidar_mask = np.logical_and(lidar_range_data > lidar_range_min, lidar_range_data < lidar_range_max)
        
-        lidar_range_data_masked = lidar_range_data[lidar_mask] 
-        lidar_radians_vec_masked = lidar_angle_data_rad[lidar_mask] 
+        # lidar_range_data_masked = lidar_range_data[lidar_mask] 
+        # lidar_radians_vec_masked = lidar_angle_data_rad[lidar_mask] 
 
-        lidar_angle_data_rad = lidar_range_data_masked
-        lidar_range_data = lidar_radians_vec_masked
+        # lidar_angle_data_rad = lidar_range_data_masked
+        # lidar_range_data = lidar_radians_vec_masked
 
 
         # print(len(angle_robot_rad), len(dist_robot))
         # print(len(angle_lhs_robot), len(angle_rhs_robot), len(dist_lhs_robot), len(dist_rhs_robot))
         # print(any(np.isnan(angle_lhs_robot)), any(np.isnan(angle_rhs_robot)), any(np.isnan(dist_lhs_robot)), any(np.isnan(dist_rhs_robot)))
     
-
 
     def coord_callback(self, msg):
         # read in the pixel coordinate message from /find_object/coord
@@ -103,11 +111,12 @@ class GetObjectRange(Node):
         width = msg.z
 
         #the angle error in radians
-        theta_error_rad = (160-x) * (62.2/320) * ((np.pi)/180)
+        theta_error_rad = (width/2-x) * (62.2/width) * ((np.pi)/180)
         # Here the error is + on the RHS from robot's POV and - for LHS
 
-        # print(theta_error_rad, (160-x) * (62.2/320))
-
+        msg_rot = Point()
+        msg_rot.z = float(theta_error_rad)
+        self.ang_publisher.publish(msg_rot)
 
 
 
