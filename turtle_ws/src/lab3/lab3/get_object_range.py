@@ -92,7 +92,7 @@ class GetObjectRange(Node):
 
         msg_pos = Point()
 
-        if x == 160:
+        if x == 999:
             theta_error_rad = 0
         msg_pos.z = float(theta_error_rad)
 
@@ -102,7 +102,7 @@ class GetObjectRange(Node):
             closest_ind = np.argmin(np.abs(self.lidar_angles - theta_error_rad))
             distance = self.lidar_data[closest_ind]
             
-            if x == 160:
+            if x == 999:
                 distance = 0.5
                 
             msg_pos.x = float(distance)
