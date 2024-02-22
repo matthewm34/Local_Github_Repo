@@ -1,0 +1,29 @@
+[0.901s] Invoking command in '/home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/src/lab3': PYTHONPATH=/home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/prefix_override:/home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab3 build --build-base /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/build install --record /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/install.log --single-version-externally-managed
+[1.093s] running egg_info
+[1.093s] writing ../../build/lab3/lab3.egg-info/PKG-INFO
+[1.093s] writing dependency_links to ../../build/lab3/lab3.egg-info/dependency_links.txt
+[1.094s] writing entry points to ../../build/lab3/lab3.egg-info/entry_points.txt
+[1.094s] writing requirements to ../../build/lab3/lab3.egg-info/requires.txt
+[1.094s] writing top-level names to ../../build/lab3/lab3.egg-info/top_level.txt
+[1.096s] reading manifest file '../../build/lab3/lab3.egg-info/SOURCES.txt'
+[1.096s] writing manifest file '../../build/lab3/lab3.egg-info/SOURCES.txt'
+[1.096s] running build
+[1.096s] running build_py
+[1.097s] copying lab3/find_object.py -> /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/build/lib/lab3
+[1.097s] running install
+[1.097s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[1.097s]   warnings.warn(
+[1.097s] running install_lib
+[1.098s] copying /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/build/lib/lab3/find_object.py -> /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/python3.10/site-packages/lab3
+[1.099s] byte-compiling /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/python3.10/site-packages/lab3/find_object.py to find_object.cpython-310.pyc
+[1.100s] running install_data
+[1.101s] running install_egg_info
+[1.102s] removing '/home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/python3.10/site-packages/lab3-0.0.0-py3.10.egg-info' (and everything under it)
+[1.103s] Copying ../../build/lab3/lab3.egg-info to /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/python3.10/site-packages/lab3-0.0.0-py3.10.egg-info
+[1.103s] running install_scripts
+[1.122s] Installing camera_debugger script to /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/lab3
+[1.122s] Installing chase_object script to /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/lab3
+[1.122s] Installing find_object script to /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/lab3
+[1.122s] Installing get_object_range script to /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/lab3
+[1.122s] writing list of installed files to '/home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/install.log'
+[1.145s] Invoked command in '/home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/src/lab3' returned '0': PYTHONPATH=/home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/prefix_override:/home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/install/lab3/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab3 build --build-base /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/build install --record /home/jwcho/Desktop/Turtlebot_Labs/turtle_ws/build/lab3/install.log --single-version-externally-managed
