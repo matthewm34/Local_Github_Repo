@@ -94,7 +94,7 @@ class ChaseObject(Node):
         ang_msg.z = float(ang_output)
 
         dist_msg = Vector3()
-        dist_msg.x = float(dist_output)*-1
+        dist_msg.x = float(dist_output)
 
 
         # publish motor commands
