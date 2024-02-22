@@ -15,8 +15,8 @@ class ChaseObject(Node):
     def __init__(self):
         super().__init__("chase_object")
 
-        self.ang_pid = PID(1, 0, 0, setpoint=0)
-        self.dist_pid = PID(1, 0, 0, setpoint=0.5)
+        self.ang_pid = PID(1, 0, 0, setpoint=0, sample_time=None, output_limits=(-1.4, 1.4))
+        self.dist_pid = PID(1, 0, 0, setpoint=0.5, sample_time=None, output_limits=(-0.1, 0.1))
 
         #Set up QoS Profiles for passing images over WiFi
         image_qos_profile = QoSProfile(
