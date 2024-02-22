@@ -23,6 +23,7 @@ setup(
             'camera_debugger = lab3.camera_debugger:main',
             'find_object = lab3.find_object:main',
             'get_object_range = lab3.get_object_range:main',
+            'chase_object = lab3.chase_object:main'
         ],
     },
 )
