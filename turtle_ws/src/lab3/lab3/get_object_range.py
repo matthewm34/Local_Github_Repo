@@ -47,6 +47,7 @@ class GetObjectRange(Node):
 
 
     def scan_callback(self, msg):
+        print('reached')
         # read in the coordinate message from /scan'
         # Notes: the lidar scans CCW starting from the robots heading
         lidar_range_raw = msg.ranges #get LIDAR values
@@ -58,15 +59,14 @@ class GetObjectRange(Node):
 
         # print("\n\n\LIDAR RANGE\n\n\n\n" + str(lidar_range_raw))
         lidar_range_data = np.array(lidar_range_raw)
-        lidar_angles = np.arange(angle_min, angle_max, angle_increment) * 180/np.pi
+        lidar_angles = np.arange(angle_min, angle_max, angle_increment)
 
 
         print(len(lidar_range_raw))
         print(len(lidar_angles))
 
-        angle_increment_deg = angle_increment * 180/np.pi
-        self.lidar_deg_inc = angle_increment_deg
-        ind_window = int(np.floor(31.1 / angle_increment_deg))
+        self.lidar_deg_inc = angle_increment
+        ind_window = int(np.floor(31.1*np.pi/180 / angle_increment))
 
         # actual LIDAR data segmented
         lidar_left = lidar_range_data[ind_window:0:-1]
