@@ -60,6 +60,10 @@ class GetObjectRange(Node):
         lidar_range_data = np.array(lidar_range_raw)
         lidar_angles = np.arange(angle_min, angle_max, angle_increment) * 180/np.pi
 
+
+        print(len(lidar_range_raw))
+        print(len(lidar_angles))
+
         angle_increment_deg = angle_increment * 180/np.pi
         self.lidar_deg_inc = angle_increment_deg
         ind_window = int(np.floor(31.1 / angle_increment_deg))
