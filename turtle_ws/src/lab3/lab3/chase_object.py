@@ -30,6 +30,7 @@ class PID():
         def measure(self, measurement, time):
             e = measurement - self.setpoint
             t_diff = time - self.time_prev
+            self.time_prev = time
 
             derv_err = (e - self.e_prev) / t_diff
 
@@ -41,7 +42,7 @@ class PID():
 
             # cap the error
             total = self.kp*e + self.ki*int_err + self.kd*derv_err
-            total = min(max(total, self.max_output),self.min_output)
+            total = max(min(total, self.max_output),self.min_output)
 
             return total
 
