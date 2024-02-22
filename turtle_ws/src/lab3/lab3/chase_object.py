@@ -90,12 +90,11 @@ class ChaseObject(Node):
         print(f"distance: {dist}\nangle: {ang}\nPIDdist: {dist_output}\nPIDang: {ang_output}")
         print('-------------------------------')
 
-
-
         # publish motor commands
-        # msg_twist = Twist()
-        # msg_twist.angular = ang_msg
-        # self.motor_publisher.publish(msg_twist)
+        msg_twist = Twist()
+        msg_twist.linear = dist_output*-1
+        msg_twist.angular = ang_output
+        self.motor_publisher.publish(msg_twist)
 
 
     def get_rotation(self, x, width):
