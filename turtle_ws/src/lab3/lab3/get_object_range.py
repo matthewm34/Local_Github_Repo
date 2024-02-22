@@ -134,12 +134,15 @@ class GetObjectRange(Node):
 
         ## DISTANCE CALCULATION
         # find the index closest to our error angle
-        closest_ind = np.argmin(np.abs(self.lidar_angles - theta_error_rad))
-        distance = self.lidar_data[closest_ind]
+        try:
+            closest_ind = np.argmin(np.abs(self.lidar_angles - theta_error_rad))
+            distance = self.lidar_data[closest_ind]
 
-        msg_dist = Point()
-        msg_dist.z = float(distance)
-        self.dist_publisher.publish(msg_dist)
+            msg_dist = Point()
+            msg_dist.z = float(distance)
+            self.dist_publisher.publish(msg_dist)
+        except:
+            pass
         
 
 def main():
