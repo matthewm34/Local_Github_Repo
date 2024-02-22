@@ -1,0 +1,26 @@
+[1.891s] Invoking command in '/home/mjmck34/Local_Github_Repo/turtle_ws/src/lab2': PYTHONPATH=/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab2/prefix_override:/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab2/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab2 build --build-base /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab2/build install --record /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab2/install.log --single-version-externally-managed
+[2.184s] running egg_info
+[2.186s] writing ../../build/lab2/lab2.egg-info/PKG-INFO
+[2.200s] writing dependency_links to ../../build/lab2/lab2.egg-info/dependency_links.txt
+[2.201s] writing entry points to ../../build/lab2/lab2.egg-info/entry_points.txt
+[2.206s] writing requirements to ../../build/lab2/lab2.egg-info/requires.txt
+[2.206s] writing top-level names to ../../build/lab2/lab2.egg-info/top_level.txt
+[2.208s] reading manifest file '../../build/lab2/lab2.egg-info/SOURCES.txt'
+[2.212s] writing manifest file '../../build/lab2/lab2.egg-info/SOURCES.txt'
+[2.212s] running build
+[2.212s] running build_py
+[2.212s] running install
+[2.212s] running install_lib
+[2.212s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[2.212s]   warnings.warn(
+[2.213s] running install_data
+[2.213s] running install_egg_info
+[2.215s] removing '/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab2/lib/python3.10/site-packages/lab2-0.0.0-py3.10.egg-info' (and everything under it)
+[2.218s] Copying ../../build/lab2/lab2.egg-info to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab2/lib/python3.10/site-packages/lab2-0.0.0-py3.10.egg-info
+[2.218s] running install_scripts
+[2.242s] Installing camera_debugger script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab2/lib/lab2
+[2.242s] Installing find_object script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab2/lib/lab2
+[2.242s] Installing get_object_range script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab2/lib/lab2
+[2.243s] Installing rotate_robot script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab2/lib/lab2
+[2.244s] writing list of installed files to '/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab2/install.log'
+[2.341s] Invoked command in '/home/mjmck34/Local_Github_Repo/turtle_ws/src/lab2' returned '0': PYTHONPATH=/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab2/prefix_override:/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab2/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab2 build --build-base /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab2/build install --record /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab2/install.log --single-version-externally-managed

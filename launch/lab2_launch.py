@@ -22,6 +22,6 @@ def generate_launch_description():
         ),
         Node(
             package='lab2',
-            executable='rotate_robot',
+            executable='get_object_range',
         )
     ])
