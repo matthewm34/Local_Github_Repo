@@ -63,15 +63,15 @@ class ChaseObject(Node):
             return 0 
 
 def main():
-    print('Running rotate_robot...')
+    print('Running chase_robot...')
 
     rclpy.init()
-    robot_rotator = RobotRotate()
+    robot_chaser = ChaseObject()
 
     while rclpy.ok():
-        rclpy.spin_once(robot_rotator)
+        rclpy.spin_once(robot_chaser)
 
-    robot_rotator.destroy_node()
+    robot_chaser.destroy_node()
     rclpy.shutdown()
 
 
