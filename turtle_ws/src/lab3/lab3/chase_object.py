@@ -5,6 +5,7 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Point, Twist, Vector3
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
+from simple-pid import PID
 
 import numpy as np
 
@@ -13,6 +14,9 @@ class ChaseObject(Node):
 
     def __init__(self):
         super().__init__("chase_object")
+
+        self.ang_pid = PID(1, 0, 0, setpoint=0)
+        self.dist_pid = PID(1, 0, 0, setpoint=0.5)
 
         #Set up QoS Profiles for passing images over WiFi
         image_qos_profile = QoSProfile(
@@ -41,14 +45,18 @@ class ChaseObject(Node):
         # for now we're just gonna rotate a specific speed
         # print(f'{x}, {y}')
 
-        print(f"distance: {dist}\nangle: {ang}\n")
+        dist_output = self.dist_pid(dist)
+        ang_output = self.ang_pid(ang)
+
+        print(f"distance: {dist}\nangle: {ang}\nPIDdist: {dist_output}\nPIDang: {ang_output}")
+        print('-------------------------------')
+
 
 
         # publish motor commands
         # msg_twist = Twist()
         # msg_twist.angular = ang_msg
         # self.motor_publisher.publish(msg_twist)
-
 
     def get_rotation(self, x, width):
         # object is on the right
