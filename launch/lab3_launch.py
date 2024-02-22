@@ -20,4 +20,8 @@ def generate_launch_description():
             package='lab3',
             executable='find_object',
         ),
+        Node(
+            package='lab3',
+            executable='get_object_range',
+        ),
     ])

@@ -9,10 +9,10 @@ from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoS
 import numpy as np
 
 
-class RobotRotate(Node):
+class ChaseObject(Node):
 
     def __init__(self):
-        super().__init__("rotate_robot")
+        super().__init__("chase_object")
 
         #Set up QoS Profiles for passing images over WiFi
         image_qos_profile = QoSProfile(
@@ -22,33 +22,32 @@ class RobotRotate(Node):
 		    depth=1
 		)
 
-        self.coord_subscriber = self.create_subscription(
+        self.pos_subscriber = self.create_subscription(
             Point,
-            '/find_object/coord',
-            self.coord_callback,
+            '/get_object_range/object_position',
+            self.pos_callback,
             image_qos_profile
         )
 
         self.motor_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
 
 
-    def coord_callback(self, msg):
+    def pos_callback(self, msg):
         # read in the coordinate message from /find_object/coord
-        x = msg.x
-        y = msg.y
-        width = msg.z
+        dist = msg.x
+        ang = msg.z
 
         # TODO: create a PID to convert coordinate to rotation
         # for now we're just gonna rotate a specific speed
         # print(f'{x}, {y}')
-        angular_vel = self.get_rotation(x,width)
-        ang_msg = Vector3()
-        ang_msg.z = float(angular_vel)
+
+        print(f"distance: {dist}\nangle: {ang}\n")
+
 
         # publish motor commands
-        msg_twist = Twist()
-        msg_twist.angular = ang_msg
-        self.motor_publisher.publish(msg_twist)
+        # msg_twist = Twist()
+        # msg_twist.angular = ang_msg
+        # self.motor_publisher.publish(msg_twist)
 
 
     def get_rotation(self, x, width):

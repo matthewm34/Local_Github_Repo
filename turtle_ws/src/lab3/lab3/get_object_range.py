@@ -42,12 +42,11 @@ class GetObjectRange(Node):
             image_qos_profile
         )
 
-        self.dist_publisher = self.create_publisher(Point, '/get_object_range/object_distance', 10) # create publiher for the object distance
-        self.ang_publisher = self.create_publisher(Point, '/get_object_range/object_angular_position', 10) # create publiher for the object angle
+        self.pos_publisher = self.create_publisher(Point, '/get_object_range/object_position', 10) # create publiher for the object distance
+        # self.ang_publisher = self.create_publisher(Point, '/get_object_range/object_angular_position', 10) # create publiher for the object angle
 
 
     def scan_callback(self, msg):
-        print('reached')
         # read in the coordinate message from /scan'
         # Notes: the lidar scans CCW starting from the robots heading
         lidar_range_raw = msg.ranges #get LIDAR values
@@ -60,10 +59,6 @@ class GetObjectRange(Node):
         # print("\n\n\LIDAR RANGE\n\n\n\n" + str(lidar_range_raw))
         lidar_range_data = np.array(lidar_range_raw)
         lidar_angles = np.arange(angle_min, angle_max, angle_increment)
-
-
-        print(len(lidar_range_raw))
-        print(len(lidar_angles))
 
         self.lidar_deg_inc = angle_increment
         ind_window = int(np.floor(31.1*np.pi/180 / angle_increment))
@@ -128,9 +123,8 @@ class GetObjectRange(Node):
         theta_error_rad = (width/2-x) * (62.2/width) * ((np.pi)/180)
         # Here the error is + on the RHS from robot's POV and - for LHS
 
-        msg_rot = Point()
-        msg_rot.z = float(theta_error_rad)
-        self.ang_publisher.publish(msg_rot)
+        msg_pos = Point()
+        msg_pos.z = float(theta_error_rad)
 
         ## DISTANCE CALCULATION
         # find the index closest to our error angle
@@ -138,12 +132,11 @@ class GetObjectRange(Node):
             closest_ind = np.argmin(np.abs(self.lidar_angles - theta_error_rad))
             distance = self.lidar_data[closest_ind]
 
-            msg_dist = Point()
-            msg_dist.z = float(distance)
-            self.dist_publisher.publish(msg_dist)
+            msg_pos.x = float(distance)
+            self.pos_publisher.publish(msg_pos)
         except:
             pass
-        
+
 
 def main():
     print('Running get_object_range...')
