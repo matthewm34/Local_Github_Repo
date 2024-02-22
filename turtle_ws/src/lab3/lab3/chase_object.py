@@ -90,10 +90,17 @@ class ChaseObject(Node):
         print(f"distance: {dist}\nangle: {ang}\nPIDdist: {dist_output}\nPIDang: {ang_output}")
         print('-------------------------------')
 
+        ang_msg = Vector3()
+        ang_msg.z = float(ang_output)
+
+        dist_msg = Vector3()
+        dist_msg.x = float(dist_output)*-1
+
+
         # publish motor commands
         msg_twist = Twist()
-        msg_twist.linear = dist_output*-1
-        msg_twist.angular = ang_output
+        msg_twist.linear = dist_msg
+        msg_twist.angular = ang_msg
         self.motor_publisher.publish(msg_twist)
 
 
