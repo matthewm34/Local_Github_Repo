@@ -5,14 +5,55 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Point, Twist, Vector3
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
+import time
 
 import numpy as np
+
+
+class PID():
+        def __init__(self, kp, ki, kd, setpoint, output_limits):
+            self.setpoint = setpoint
+            self.kp = kp
+            self.ki = ki
+            self.kd = kd
+
+            self.e_prev = 0
+
+            self.time_prev = 0
+
+            self.integral_window = []
+
+            self.min_output = output_limits[0]
+            self.max_output = output_limits[1]
+        
+
+        def measure(self, measurement, time):
+            e = measurement - self.setpoint
+            t_diff = time - self.time_prev
+            self.time_prev = time
+
+            derv_err = (e - self.e_prev) / t_diff
+
+            self.integral_window.append(e*t_diff)
+            if len(self.integral_window) > 20:
+                self.integral_window.pop(0)
+
+            int_err = np.sum(self.integral_window)
+
+            # cap the error
+            total = self.kp*e + self.ki*int_err + self.kd*derv_err
+            total = max(min(total, self.max_output),self.min_output)
+
+            return total
 
 
 class ChaseObject(Node):
 
     def __init__(self):
         super().__init__("chase_object")
+
+        self.ang_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-1.4, 1.4))
+        self.dist_pid = PID(1.02, 0, 0.02, setpoint=0.5, output_limits=(-0.1, 0.1))
 
         #Set up QoS Profiles for passing images over WiFi
         image_qos_profile = QoSProfile(
@@ -33,6 +74,8 @@ class ChaseObject(Node):
 
 
     def pos_callback(self, msg):
+        curr_time = time.time()
+
         # read in the coordinate message from /find_object/coord
         dist = msg.x
         ang = msg.z
@@ -41,13 +84,24 @@ class ChaseObject(Node):
         # for now we're just gonna rotate a specific speed
         # print(f'{x}, {y}')
 
-        print(f"distance: {dist}\nangle: {ang}\n")
+        dist_output = self.dist_pid.measure(dist, curr_time)
+        ang_output = self.ang_pid.measure(ang, curr_time)
+
+        print(f"distance: {dist}\nangle: {ang}\nPIDdist: {dist_output}\nPIDang: {ang_output}")
+        print('-------------------------------')
+
+        ang_msg = Vector3()
+        ang_msg.z = float(ang_output)
+
+        dist_msg = Vector3()
+        dist_msg.x = float(dist_output)
 
 
         # publish motor commands
-        # msg_twist = Twist()
-        # msg_twist.angular = ang_msg
-        # self.motor_publisher.publish(msg_twist)
+        msg_twist = Twist()
+        msg_twist.linear = dist_msg
+        msg_twist.angular = ang_msg
+        self.motor_publisher.publish(msg_twist)
 
 
     def get_rotation(self, x, width):

@@ -85,11 +85,15 @@ class GetObjectRange(Node):
         y = msg.y
         width = msg.z
 
+
         # the angle error in radians
         theta_error_rad = (width/2-x) * (62.2/width) * ((np.pi)/180)
         # Here the error is + on the RHS from robot's POV and - for LHS
 
         msg_pos = Point()
+
+        if x == 999:
+            theta_error_rad = 0
         msg_pos.z = float(theta_error_rad)
 
         ## DISTANCE CALCULATION
@@ -97,7 +101,10 @@ class GetObjectRange(Node):
         try:
             closest_ind = np.argmin(np.abs(self.lidar_angles - theta_error_rad))
             distance = self.lidar_data[closest_ind]
-
+            
+            if x == 999:
+                distance = 0.5
+                
             msg_pos.x = float(distance)
             self.pos_publisher.publish(msg_pos)
         except:
