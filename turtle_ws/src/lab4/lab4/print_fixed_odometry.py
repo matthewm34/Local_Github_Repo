@@ -33,7 +33,7 @@ class print_transformed_odom(Node):
     def update_Odometry(self,Odom):
         position = Odom.pose.pose.position
         
-        #Orientation uses the quaternion aprametrization.
+        #Orientation uses the quaternion parametrization.
         #To get the angular position along the z-axis, the following equation is required.
         q = Odom.pose.pose.orientation
         orientation = np.arctan2(2*(q.w*q.z+q.x*q.y),1-2*(q.y*q.y+q.z*q.z))
