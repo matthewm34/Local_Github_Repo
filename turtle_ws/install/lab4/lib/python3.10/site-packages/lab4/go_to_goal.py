@@ -61,11 +61,10 @@ class GoToGoal(Node):
 
     def __init__(self):
 
-        self.count = 1 # initialize the goal counter as 1st cehckpoint
-        self.first_iteration = True 
+        self.count = 1
 
         self.ang_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-1.4, 1.4))
-        self.dist_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-0.1, 0.1))
+        self.dist_pid = PID(1.02, 0, 0.02, setpoint=0.5, output_limits=(-0.1, 0.1))
 
         super().__init__("go_to_goal")
         # State (for the update_Odometry code)
@@ -110,124 +109,59 @@ class GoToGoal(Node):
 
 
     def odom_callback(self, data):
+        curr_time = time.time()
 
-        curr_time = time.time() # get current time
+        waypoint_loc = np.array([[1.5, 0],
+                        [1.5, 1.4],
+                        [0, 1.4]
+                        ])
 
-        waypoint_global_loc = np.array([[.5, 0, 1], # waypoint locations constant
-                                    [.5, .4,  1],
-                                    [ 0, .4, 1]
-                                    ])        
-        
-        cur_pos_x, cur_pos_y, cur_angle_rad = self.update_Odometry(data) # update the odometry data
+        cur_pos_x, cur_pos_y, cur_angle_rad = self.update_Odometry(data)
+
         print(cur_pos_x, cur_pos_y, cur_angle_rad)
-        
-        # wrap this? 
-        transformation_matrix = np.matrix([[np.cos(cur_angle_rad), -np.sin(cur_angle_rad), cur_pos_x],
-                                        [np.sin(cur_angle_rad), np.cos(cur_angle_rad), cur_pos_y],
-                                        [0,                             0,                  1  ]])
-
 
         if self.count == 1:
-            local_checkpoint_vec = transformation_matrix.I @ waypoint_global_loc[0,:].reshape(-1,1)
-            local_checkpoint_dist_x = local_checkpoint_vec[0]
-            local_checkpoint_dist_y = local_checkpoint_vec[1]
-            desired_angle = np.pi/2 #straight ahead
+            checkpoint_x, checkpoint_y = waypoint_loc[0,:]
         elif self.count == 2:
-            local_checkpoint_vec = transformation_matrix.I @ waypoint_global_loc[1,:].reshape(-1,1)
-            local_checkpoint_dist_x = local_checkpoint_vec[0]
-            local_checkpoint_dist_y = local_checkpoint_vec[1]
-            desired_angle = np.pi#90 degrees to the left
+            checkpoint_x, checkpoint_y = waypoint_loc[1,:]
         elif self.count == 3:
-            local_checkpoint_vec = transformation_matrix.I @ waypoint_global_loc[2,:].reshape(-1,1)
-            local_checkpoint_dist_x = local_checkpoint_vec[0]
-            local_checkpoint_dist_y = local_checkpoint_vec[1]
-            desired_angle = 3*np.pi/2 #another 90 degrees to the left
+            checkpoint_x, checkpoint_y = waypoint_loc[2,:]
 
-        
-        distance_error = local_checkpoint_dist_x #determine distance between robot and checkpoint
 
-        local_goal_direction = np.arctan2(local_checkpoint_dist_y,local_checkpoint_dist_x)
-        theta_error = local_goal_direction - cur_angle_rad #determine distance between robot and checkpoint
-        #TODO do i have to wrap theta error???
+        distance_error = np.sqrt((checkpoint_x - cur_pos_x)**2 + (checkpoint_x - cur_pos_y)**2)
 
-        dist_output = self.dist_pid.measure(distance_error, curr_time) #PID for distance, approaching checkpoint
-        ang_output = self.ang_pid.measure(theta_error, curr_time) #PID for rotating 90 degrees, once reached checkpoint
-        
-        print(f"distance: {distance_error}\nangle: {theta_error}\nPIDdist: {dist_output}\ntheta_error: {theta_error}")
-    
+
+        dist_output = self.dist_pid.measure(distance_error, curr_time)
+        # ang_output = self.ang_pid.measure(ang, curr_time)
+
+        # print(f"distance: {dist}\nangle: {ang}\nPIDdist: {dist_output}\nPIDang: {ang_output}")
+        ang = 0
+        print(f"distance: {distance_error}\nangle: {ang}\nPIDdist: {dist_output}")
 
         print('-------------------------------')
 
+        ang_msg = Vector3()
+        # ang_msg.z = float(ang_output)
+        ang_msg.z = float(0)
 
+        dist_msg = Vector3()
+        dist_msg.x = float(dist_output)
 
-        # if reached the checkpoint 
-        # if theta_error > 180/np.pi * 3:
-        #     test
-        
-        print('local_goal_dir' + str(local_goal_direction))
-        # if  theta_error > np.pi/180 * 5: # if the heading of the robot is greater than 5 degrees away from the goal direction
-        if theta_error > np.pi/180 * 1:
-            # rotate robot 90 degrees ccw since its at checkpoint
-            dist_msg = Vector3()
-            dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
-            ang_msg = Vector3()
-            ang_msg.z = float(ang_output)# positive for turning ccw
-            msg_twist = Twist()
-            msg_twist.angular = ang_msg
-            self.motor_publisher.publish(msg_twist)
-
-
-            # elif local_goal_direction < -np.pi/180 * 5:
-        elif theta_error < -np.pi/180 * 1:
-            dist_msg = Vector3()
-            dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
-            ang_msg = Vector3()
-            ang_msg.z = -float(ang_output) # negative for turning ccw
-            msg_twist = Twist()
-            msg_twist.angular = ang_msg
-            self.motor_publisher.publish(msg_twist)  
-
-
-            # go to goal state ----------------------------------------------------------
-        elif distance_error < .025: # made it to checkpoint -> set vel = 0
+        if checkpoint_x - cur_pos_x < .1:
             dist_msg = Vector3()
             dist_msg.x = float(0)
             dist_msg.y = float(0)
             msg_twist = Twist()
             msg_twist.linear = dist_msg
             self.motor_publisher.publish(msg_twist)
-
-            if self.first_iteration == True: # wait at checkpoint
-                #stop at the checkpoint for 10 seconds
-                print('Waiting at Checkpoint 2 seconds')
-                time.sleep(2)
-                self.first_iteration = False
-                self.count = self.count + 1 # set count to move toward next checkpoint
             
-
-
-
-        else: #if not at checkpoint -> move forward 
+        else:
             # publish motor commands
-            dist_msg = Vector3()
-            dist_msg.x = float(dist_output)
-
             msg_twist = Twist()
             msg_twist.linear = dist_msg
+            msg_twist.angular = ang_msg
             self.motor_publisher.publish(msg_twist)
-
-
-        # end go to goal state ----------------------------------------------------------
-
-
-
-        # avoid obstacl state ----------------------------------------------------------
-
-            
-        # avoid obstace state
-
-            
-       
+            test = 0
 
 
 

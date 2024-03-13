@@ -1,8 +1,14 @@
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/rotation_script.py
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/print_fixed_odometry.py
+/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/go_to_goal.py
+/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/go_to_goal copy.py
+/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/get_object_range.py
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/__init__.py
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/__pycache__/rotation_script.cpython-310.pyc
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/__pycache__/print_fixed_odometry.cpython-310.pyc
+/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/__pycache__/go_to_goal.cpython-310.pyc
+/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/__pycache__/go_to_goal copy.cpython-310.pyc
+/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/__pycache__/get_object_range.cpython-310.pyc
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/__pycache__/__init__.cpython-310.pyc
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/share/ament_index/resource_index/packages/lab4
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/share/lab4/package.xml
@@ -13,5 +19,6 @@
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4-0.0.0-py3.10.egg-info/zip-safe
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4-0.0.0-py3.10.egg-info/PKG-INFO
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4-0.0.0-py3.10.egg-info/entry_points.txt
+/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/lab4/get_object_range
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/lab4/print_fixed_odometry
 /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/lab4/rotation_script

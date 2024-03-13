@@ -9,6 +9,9 @@ setup.py
 ../../build/lab4/lab4.egg-info/top_level.txt
 ../../build/lab4/lab4.egg-info/zip-safe
 lab4/__init__.py
+lab4/get_object_range.py
+lab4/go_to_goal copy.py
+lab4/go_to_goal.py
 lab4/print_fixed_odometry.py
 lab4/rotation_script.py
 resource/lab4

@@ -1,0 +1,37 @@
+[3.722s] Invoking command in '/home/mjmck34/Local_Github_Repo/turtle_ws/src/lab4': PYTHONPATH=/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/prefix_override:/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab4 build --build-base /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build install --record /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/install.log --single-version-externally-managed
+[4.508s] running egg_info
+[4.509s] writing ../../build/lab4/lab4.egg-info/PKG-INFO
+[4.510s] writing dependency_links to ../../build/lab4/lab4.egg-info/dependency_links.txt
+[4.516s] writing entry points to ../../build/lab4/lab4.egg-info/entry_points.txt
+[4.542s] writing requirements to ../../build/lab4/lab4.egg-info/requires.txt
+[4.542s] writing top-level names to ../../build/lab4/lab4.egg-info/top_level.txt
+[4.542s] reading manifest file '../../build/lab4/lab4.egg-info/SOURCES.txt'
+[4.542s] writing manifest file '../../build/lab4/lab4.egg-info/SOURCES.txt'
+[4.542s] running build
+[4.542s] running build_py
+[4.542s] copying lab4/print_fixed_odometry.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build/lib/lab4
+[4.546s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[4.546s]   warnings.warn(
+[4.572s] copying lab4/go_to_goal.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build/lib/lab4
+[4.573s] copying lab4/go_to_goal copy.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build/lib/lab4
+[4.573s] copying lab4/get_object_range.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build/lib/lab4
+[4.573s] running install
+[4.573s] running install_lib
+[4.573s] copying /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build/lib/lab4/print_fixed_odometry.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4
+[4.573s] copying /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build/lib/lab4/go_to_goal.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4
+[4.573s] copying /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build/lib/lab4/go_to_goal copy.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4
+[4.573s] copying /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build/lib/lab4/get_object_range.py -> /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4
+[4.574s] byte-compiling /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/print_fixed_odometry.py to print_fixed_odometry.cpython-310.pyc
+[4.574s] byte-compiling /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/go_to_goal.py to go_to_goal.cpython-310.pyc
+[4.574s] byte-compiling /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/go_to_goal copy.py to go_to_goal copy.cpython-310.pyc
+[4.574s] byte-compiling /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4/get_object_range.py to get_object_range.cpython-310.pyc
+[4.574s] running install_data
+[4.575s] running install_egg_info
+[4.575s] removing '/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4-0.0.0-py3.10.egg-info' (and everything under it)
+[4.575s] Copying ../../build/lab4/lab4.egg-info to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4-0.0.0-py3.10.egg-info
+[4.578s] running install_scripts
+[4.663s] Installing get_object_range script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/lab4
+[4.663s] Installing print_fixed_odometry script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/lab4
+[4.663s] Installing rotation_script script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/lab4
+[4.663s] writing list of installed files to '/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/install.log'
+[4.973s] Invoked command in '/home/mjmck34/Local_Github_Repo/turtle_ws/src/lab4' returned '0': PYTHONPATH=/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/prefix_override:/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab4 build --build-base /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build install --record /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/install.log --single-version-externally-managed
