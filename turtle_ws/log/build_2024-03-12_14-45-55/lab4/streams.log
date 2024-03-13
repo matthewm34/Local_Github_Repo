@@ -1,0 +1,24 @@
+[2.274s] Invoking command in '/home/mjmck34/Local_Github_Repo/turtle_ws/src/lab4': PYTHONPATH=/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/prefix_override:/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab4 build --build-base /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build install --record /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/install.log --single-version-externally-managed
+[2.636s] running egg_info
+[2.636s] writing ../../build/lab4/lab4.egg-info/PKG-INFO
+[2.638s] writing dependency_links to ../../build/lab4/lab4.egg-info/dependency_links.txt
+[2.639s] writing entry points to ../../build/lab4/lab4.egg-info/entry_points.txt
+[2.651s] writing requirements to ../../build/lab4/lab4.egg-info/requires.txt
+[2.651s] writing top-level names to ../../build/lab4/lab4.egg-info/top_level.txt
+[2.654s] reading manifest file '../../build/lab4/lab4.egg-info/SOURCES.txt'
+[2.654s] writing manifest file '../../build/lab4/lab4.egg-info/SOURCES.txt'
+[2.654s] running build
+[2.654s] running build_py
+[2.657s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[2.657s]   warnings.warn(
+[2.657s] running install
+[2.657s] running install_lib
+[2.657s] running install_data
+[2.668s] running install_egg_info
+[2.668s] removing '/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4-0.0.0-py3.10.egg-info' (and everything under it)
+[2.668s] Copying ../../build/lab4/lab4.egg-info to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages/lab4-0.0.0-py3.10.egg-info
+[2.668s] running install_scripts
+[2.688s] Installing print_fixed_odometry script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/lab4
+[2.689s] Installing rotation_script script to /home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/lab4
+[2.689s] writing list of installed files to '/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/install.log'
+[2.741s] Invoked command in '/home/mjmck34/Local_Github_Repo/turtle_ws/src/lab4' returned '0': PYTHONPATH=/home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/prefix_override:/home/mjmck34/Local_Github_Repo/turtle_ws/install/lab4/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/lab4 build --build-base /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/build install --record /home/mjmck34/Local_Github_Repo/turtle_ws/build/lab4/install.log --single-version-externally-managed

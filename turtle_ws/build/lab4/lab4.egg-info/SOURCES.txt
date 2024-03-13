@@ -9,6 +9,8 @@ setup.py
 ../../build/lab4/lab4.egg-info/top_level.txt
 ../../build/lab4/lab4.egg-info/zip-safe
 lab4/__init__.py
+lab4/print_fixed_odometry.py
+lab4/rotation_script.py
 resource/lab4
 test/test_copyright.py
 test/test_flake8.py

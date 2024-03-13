@@ -33,7 +33,7 @@ class print_transformed_odom(Node):
     def update_Odometry(self,Odom):
         position = Odom.pose.pose.position
         
-        #Orientation uses the quaternion parametrization.
+        #Orientation uses the quaternion aprametrization.
         #To get the angular position along the z-axis, the following equation is required.
         q = Odom.pose.pose.orientation
         orientation = np.arctan2(2*(q.w*q.z+q.x*q.y),1-2*(q.y*q.y+q.z*q.z))
@@ -55,6 +55,7 @@ class print_transformed_odom(Node):
         self.globalAng = orientation - self.Init_ang
     
         self.get_logger().info('Transformed global pose is x:{}, y:{}, a:{}'.format(self.globalPos.x,self.globalPos.y,self.globalAng))
+        print('Transformed global pose is x:{}, y:{}, a:{}'.format(self.globalPos.x,self.globalPos.y,self.globalAng))
     
 def main(args=None):
     rclpy.init(args=args)
