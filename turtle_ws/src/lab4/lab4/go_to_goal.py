@@ -116,9 +116,9 @@ class GoToGoal(Node):
 
         curr_time = time.time() # get current time
 
-        waypoint_global_loc = np.array([[.8, 0, 1], # waypoint locations constant
-                                    [.8, .8,  1],
-                                    [ 0, .8, 1]
+        waypoint_global_loc = np.array([[1.5, 0, 1], # waypoint locations constant
+                                    [1.5, 1.4,  1],
+                                    [ 0, 1.4, 1]
                                     ])        
         
         cur_pos_x, cur_pos_y, cur_angle_rad = self.update_Odometry(data) # update the odometry data
@@ -129,6 +129,10 @@ class GoToGoal(Node):
                                         [np.sin(cur_angle_rad), np.cos(cur_angle_rad), cur_pos_y],
                                         [0,                             0,                  1  ]])
 
+
+        print('-------------------------------')
+        print(f'Count: {self.count}')
+        print(f'Go to goal check: {self.GoGoal}')
 
         if self.count == 1:
             local_checkpoint_vec = transformation_matrix.I @ waypoint_global_loc[0,:].reshape(-1,1)
@@ -188,15 +192,8 @@ class GoToGoal(Node):
             dist_output = self.dist_pid.measure(distance_error, curr_time) #PID for distance, approaching checkpoint
             ang_output = self.ang_pid.measure(theta_error, curr_time) #PID for rotating 90 degrees, once reached checkpoint
             
-            print(f"distance: {distance_error}\nangle: {theta_error}\nPIDdist: {dist_output}\ntheta_error: {theta_error}")
-        
-
-            print('-------------------------------')
-
-
+            print(f"distance: {distance_error}\nangle: {theta_error}\nPIDdist: {dist_output}")
             # go to goal state ----------------------------------------------------------
-
-            print('local_goal_dir' + str(local_goal_direction))
             # if  theta_error > np.pi/180 * 5: # if the heading of the robot is greater than 5 degrees away from the goal direction
             if theta_error > np.pi/180 * 1:
                 # rotate robot 90 degrees ccw since its at checkpoint
