@@ -64,6 +64,9 @@ class GoToGoal(Node):
         self.count = 1 # initialize the goal counter as 1st cehckpoint
         self.first_iteration = True 
 
+        self.GoGoal = True # flag for converting between go to goal and avoid obstacle
+        self.turnDir = None # direction to turn when in avoid obstacle state
+
         self.ang_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-1.4, 1.4))
         self.dist_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-0.2, 0.2))
 
@@ -148,91 +151,98 @@ class GoToGoal(Node):
             #terminate code -> made it to the end
 
         
-        distance_error = local_checkpoint_dist_x #determine distance between robot and checkpoint
+        if not self.GoGoal:
 
-        local_goal_direction = np.arctan2(local_checkpoint_dist_y,local_checkpoint_dist_x)
-        theta_error = local_goal_direction - cur_angle_rad #determine distance between robot and checkpoint
-        theta_error = local_goal_direction
+            print("in obstacle avoidance state")
+            if self.turnDir is None:
+                # move forward in twist
+                linSpeed = 0.1
+                turnSpeed = 0
 
-        #TODO do i have to wrap theta error???
+            else:
+                linSpeed = 0
+                # angular velocity 
+                if self.turnDir == 'CW':
+                    turnSpeed = -0.7
+                else:
+                    turnSpeed = 0.7
 
-        dist_output = self.dist_pid.measure(distance_error, curr_time) #PID for distance, approaching checkpoint
-        ang_output = self.ang_pid.measure(theta_error, curr_time) #PID for rotating 90 degrees, once reached checkpoint
+            
+            dist_msg = Vector3()
+            dist_msg.x, dist_msg.y  = float(linSpeed), float(0) # make sure linear velocity is zero
+            ang_msg = Vector3()
+            msg_twist = Twist()
+            msg_twist.angular = turnSpeed
+            self.motor_publisher.publish(msg_twist)
+
+        else:
         
-        print(f"distance: {distance_error}\nangle: {theta_error}\nPIDdist: {dist_output}\ntheta_error: {theta_error}")
-    
+            distance_error = local_checkpoint_dist_x #determine distance between robot and checkpoint
 
-        print('-------------------------------')
+            local_goal_direction = np.arctan2(local_checkpoint_dist_y,local_checkpoint_dist_x)
+            theta_error = local_goal_direction - cur_angle_rad #determine distance between robot and checkpoint
+            theta_error = local_goal_direction
 
+            #TODO do i have to wrap theta error???
 
-        # go to goal state ----------------------------------------------------------
-
-        print('local_goal_dir' + str(local_goal_direction))
-        # if  theta_error > np.pi/180 * 5: # if the heading of the robot is greater than 5 degrees away from the goal direction
-        if theta_error > np.pi/180 * 1:
-            # rotate robot 90 degrees ccw since its at checkpoint
-            dist_msg = Vector3()
-            dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
-            ang_msg = Vector3()
-            ang_msg.z = float(ang_output)# positive for turning ccw
-            msg_twist = Twist()
-            msg_twist.angular = ang_msg
-            self.motor_publisher.publish(msg_twist)
-
-
-            # elif local_goal_direction < -np.pi/180 * 5:
-        elif theta_error < -np.pi/180 * 1:
-            dist_msg = Vector3()
-            dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
-            ang_msg = Vector3()
-            ang_msg.z = float(ang_output) # negative for turning ccw
-            msg_twist = Twist()
-            msg_twist.angular = ang_msg
-            self.motor_publisher.publish(msg_twist)  
-
-
-            #reached the checkpoint
-        elif distance_error < .025: # made it to checkpoint -> set vel = 0
-            dist_msg = Vector3()
-            dist_msg.x = float(0)
-            dist_msg.y = float(0)
-            msg_twist = Twist()
-            msg_twist.linear = dist_msg
-            self.motor_publisher.publish(msg_twist)
-
-            # if self.first_iteration == True: # wait at checkpoint
-            #stop at the checkpoint for 10 seconds
-            print('Waiting at Checkpoint 5 seconds')
-            time.sleep(5)
-            # self.first_iteration = False
-            self.count = self.count + 1 # set count to move toward next checkpoint
+            dist_output = self.dist_pid.measure(distance_error, curr_time) #PID for distance, approaching checkpoint
+            ang_output = self.ang_pid.measure(theta_error, curr_time) #PID for rotating 90 degrees, once reached checkpoint
             
+            print(f"distance: {distance_error}\nangle: {theta_error}\nPIDdist: {dist_output}\ntheta_error: {theta_error}")
+        
+
+            print('-------------------------------')
 
 
+            # go to goal state ----------------------------------------------------------
 
-        else: #if not at checkpoint -> move forward 
-            # publish motor commands
-            dist_msg = Vector3()
-            dist_msg.x = float(dist_output)
+            print('local_goal_dir' + str(local_goal_direction))
+            # if  theta_error > np.pi/180 * 5: # if the heading of the robot is greater than 5 degrees away from the goal direction
+            if theta_error > np.pi/180 * 1:
+                # rotate robot 90 degrees ccw since its at checkpoint
+                dist_msg = Vector3()
+                dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
+                ang_msg = Vector3()
+                ang_msg.z = float(ang_output)# positive for turning ccw
+                msg_twist = Twist()
+                msg_twist.angular = ang_msg
+                self.motor_publisher.publish(msg_twist)
 
-            msg_twist = Twist()
-            msg_twist.linear = dist_msg
-            self.motor_publisher.publish(msg_twist)
-            self.first_iteration = True
+                # elif local_goal_direction < -np.pi/180 * 5:
+            elif theta_error < -np.pi/180 * 1:
+                dist_msg = Vector3()
+                dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
+                ang_msg = Vector3()
+                ang_msg.z = float(ang_output) # negative for turning ccw
+                msg_twist = Twist()
+                msg_twist.angular = ang_msg
+                self.motor_publisher.publish(msg_twist)  
 
+                #reached the checkpoint
+            elif distance_error < .025: # made it to checkpoint -> set vel = 0
+                dist_msg = Vector3()
+                dist_msg.x = float(0)
+                dist_msg.y = float(0)
+                msg_twist = Twist()
+                msg_twist.linear = dist_msg
+                self.motor_publisher.publish(msg_twist)
 
-        # end go to goal state ----------------------------------------------------------
+                # if self.first_iteration == True: # wait at checkpoint
+                #stop at the checkpoint for 10 seconds
+                print('Waiting at Checkpoint 5 seconds')
+                time.sleep(5)
+                # self.first_iteration = False
+                self.count = self.count + 1 # set count to move toward next checkpoint
 
+            else: #if not at checkpoint -> move forward 
+                # publish motor commands
+                dist_msg = Vector3()
+                dist_msg.x = float(dist_output)
 
-
-        # avoid obstacl state ----------------------------------------------------------
-
-            
-        # avoid obstace state
-
-            
-       
-
+                msg_twist = Twist()
+                msg_twist.linear = dist_msg
+                self.motor_publisher.publish(msg_twist)
+                self.first_iteration = True
 
 
     def update_Odometry(self,Odom):
@@ -265,9 +275,30 @@ class GoToGoal(Node):
         return cur_pos_x, cur_pos_y, cur_angle_rad #all of type float
 
 
-  
     def range_callback(self, msg):
-        test = 0
+        center = msg.x # index of the range vector at which the minimum distane of the "obstacle" is at
+        range = msg.y # length of the lidar vector from -90 to 90 degrees
+
+        if center == 100:
+            # set state to go to goal 
+            self.GoGoal = True
+
+        else:
+            self.GoGoal = False
+
+            if center < range/2:    # object is on the left side
+                if center < 10:
+                    self.turnDir = None
+                else:
+                    # turn clockwise until center is below 10
+                    self.turnDir = 'CW'
+            else:
+                if center > range-10:
+                    # move forward
+                    self.turnDir = None
+                else:
+                    # turn counter clockwise until center is below 10
+                    self.turnDir = 'CCW'
 
 
     

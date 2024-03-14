@@ -50,15 +50,15 @@ class GetObjectRange(Node):
         lidar_range_min = msg.range_min
         lidar_range_max = msg.range_max
         angle_increment = msg.angle_increment
-        angle_min = msg.angle_min  
-        angle_max = msg.angle_max  
+        angle_min = msg.angle_min
+        angle_max = msg.angle_max
 
         # print("\n\n\LIDAR RANGE\n\n\n\n" + str(lidar_range_raw))
         lidar_range_data = np.array(lidar_range_raw)
         lidar_angles = np.arange(angle_min, angle_max, angle_increment)
 
         self.lidar_deg_inc = angle_increment
-        ind_window = int(np.floor(31.1*np.pi/180 / angle_increment))
+        ind_window = int(np.floor(90*np.pi/180 / angle_increment))
 
         # actual LIDAR data segmented
         lidar_left = lidar_range_data[ind_window:0:-1]
@@ -74,6 +74,22 @@ class GetObjectRange(Node):
 
         self.lidar_data = masked_lidar
         self.lidar_angles = masked_lidar_angles
+
+
+
+        ## filter lidar values
+        masked_lidar[masked_lidar > 0.15] = 3
+
+        if min(masked_lidar) == 3:
+            ind_max = 100
+        else:  
+            ind_max = np.where(masked_lidar == min(masked_lidar))[0]
+
+        msg_pos = Point()
+        msg_pos.x = float(ind_max)
+        msg_pos.y = float(len(masked_lidar))
+
+        self.pos_publisher.publish(msg_pos)
     
 
     def coord_callback(self, msg):
