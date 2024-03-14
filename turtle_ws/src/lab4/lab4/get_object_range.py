@@ -80,8 +80,11 @@ class GetObjectRange(Node):
 
         if min(masked_lidar) == 3:
             ind_max = 100
-        else:  
-            ind_max = np.where(masked_lidar == min(masked_lidar))[0][0]
+        else:
+            try:
+                ind_max = np.where(masked_lidar == min(masked_lidar))[0][0]
+            except:
+                ind_max = np.where(masked_lidar == min(masked_lidar))[0]
 
         msg_pos = Point()
         msg_pos.x = float(ind_max)
