@@ -276,7 +276,7 @@ class GoToGoal(Node):
         center = msg.x # index of the range vector at which the minimum distane of the "obstacle" is at
         range = msg.y # length of the lidar vector from -90 to 90 degrees
 
-        if center == 100:
+        if center == 900:
             # set state to go to goal 
             self.GoGoal = True
 
