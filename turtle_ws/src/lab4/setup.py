@@ -21,8 +21,9 @@ setup(
     entry_points={
         'console_scripts': [
             'print_fixed_odometry = lab4.print_fixed_odometry:main',
-            'rotation_script = lab3.rotation_script:main',
-            'get_object_range = lab3.get_object_range:main',
+            'rotation_script = lab4.rotation_script:main',
+            'get_object_range = lab4.get_object_range:main',
+            'go_to_goal = lab4.go_to_goal:main',
         ],
     },
 )
