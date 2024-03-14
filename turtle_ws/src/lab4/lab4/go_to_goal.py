@@ -286,13 +286,13 @@ class GoToGoal(Node):
             self.GoGoal = False
 
             if center < range/2:    # object is on the left side
-                if center < 10:
+                if center < 20:
                     self.turnDir = None
                 else:
                     # turn clockwise until center is below 10
                     self.turnDir = 'CW'
             else:
-                if center > range-10:
+                if center > range-20:
                     # move forward
                     self.turnDir = None
                 else:

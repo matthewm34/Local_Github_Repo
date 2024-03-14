@@ -78,7 +78,7 @@ class GetObjectRange(Node):
         print(masked_lidar)
 
         ## filter lidar values
-        masked_lidar[masked_lidar > 0.35] = 3
+        masked_lidar[masked_lidar > 0.2] = 3
         masked_lidar = np.nan_to_num(masked_lidar, nan=3)
 
         if min(masked_lidar) == 3:  
