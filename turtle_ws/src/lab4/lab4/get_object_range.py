@@ -79,6 +79,7 @@ class GetObjectRange(Node):
 
         ## filter lidar values
         masked_lidar[masked_lidar > 0.15] = 3
+        masked_lidar = np.nan_to_num(masked_lidar, nan=3)
 
         if min(masked_lidar) == 3:
             ind_max = 100
@@ -89,7 +90,10 @@ class GetObjectRange(Node):
                 ind_max = np.where(masked_lidar == min(masked_lidar))[0]
 
         msg_pos = Point()
-        msg_pos.x = float(ind_max)
+        try:
+            msg_pos.x = float(ind_max)
+        except:
+            msg_pos.x = float(ind_max[0])
         msg_pos.y = float(len(masked_lidar))
 
         self.pos_publisher.publish(msg_pos)
