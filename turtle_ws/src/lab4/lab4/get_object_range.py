@@ -75,7 +75,7 @@ class GetObjectRange(Node):
         self.lidar_data = masked_lidar
         self.lidar_angles = masked_lidar_angles
 
-        print(self.masked_lidar)
+        print(masked_lidar)
 
         ## filter lidar values
         masked_lidar[masked_lidar > 0.15] = 3
