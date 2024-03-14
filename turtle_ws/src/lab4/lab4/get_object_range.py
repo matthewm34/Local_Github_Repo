@@ -75,8 +75,6 @@ class GetObjectRange(Node):
         self.lidar_data = masked_lidar
         self.lidar_angles = masked_lidar_angles
 
-
-
         ## filter lidar values
         masked_lidar[masked_lidar > 0.15] = 3
 
@@ -91,38 +89,6 @@ class GetObjectRange(Node):
 
         self.pos_publisher.publish(msg_pos)
     
-
-    def coord_callback(self, msg):
-        # read in the pixel coordinate message from /find_object/coord
-        x = msg.x
-        y = msg.y
-        width = msg.z
-
-
-        # the angle error in radians
-        theta_error_rad = (width/2-x) * (62.2/width) * ((np.pi)/180)
-        # Here the error is + on the RHS from robot's POV and - for LHS
-
-        msg_pos = Point()
-
-        if x == 999:
-            theta_error_rad = 0
-        msg_pos.z = float(theta_error_rad)
-
-        ## DISTANCE CALCULATION
-        # find the index closest to our error angle
-        try:
-            closest_ind = np.argmin(np.abs(self.lidar_angles - theta_error_rad))
-            distance = self.lidar_data[closest_ind]
-            
-            if x == 999:
-                distance = 0.5
-                
-            msg_pos.x = float(distance)
-            self.pos_publisher.publish(msg_pos)
-        except:
-            pass
-
 
 def main():
     print('Running get_object_range...')
