@@ -177,6 +177,7 @@ class GoToGoal(Node):
             ang_msg = Vector3()
             ang_msg.z = float(turnSpeed)
             msg_twist = Twist()
+            msg_twist.linear = dist_msg
             msg_twist.angular = ang_msg
             self.motor_publisher.publish(msg_twist)
 
