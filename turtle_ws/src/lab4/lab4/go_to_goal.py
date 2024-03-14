@@ -67,8 +67,8 @@ class GoToGoal(Node):
         self.GoGoal = True # flag for converting between go to goal and avoid obstacle
         self.turnDir = None # direction to turn when in avoid obstacle state
 
-        self.ang_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-1.4, 1.4))
-        self.dist_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-0.2, 0.2))
+        self.ang_pid = PID(1, 0, 0, setpoint=0, output_limits=(-1.4, 1.4))
+        self.dist_pid = PID(1, 0, 0, setpoint=0, output_limits=(-0.2, 0.2))
 
         super().__init__("go_to_goal")
         # State (for the update_Odometry code)
@@ -195,7 +195,7 @@ class GoToGoal(Node):
             print(f"distance: {distance_error}\nangle: {theta_error}\nPIDdist: {dist_output}")
             # go to goal state ----------------------------------------------------------
             # if  theta_error > np.pi/180 * 5: # if the heading of the robot is greater than 5 degrees away from the goal direction
-            if theta_error > np.pi/180 * 1:
+            if theta_error > np.pi/180 * 5:
                 # rotate robot 90 degrees ccw since its at checkpoint
                 dist_msg = Vector3()
                 dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
@@ -206,7 +206,7 @@ class GoToGoal(Node):
                 self.motor_publisher.publish(msg_twist)
 
                 # elif local_goal_direction < -np.pi/180 * 5:
-            elif theta_error < -np.pi/180 * 1:
+            elif theta_error < -np.pi/180 * 5:
                 dist_msg = Vector3()
                 dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
                 ang_msg = Vector3()
