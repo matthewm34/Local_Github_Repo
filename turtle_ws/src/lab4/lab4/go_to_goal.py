@@ -65,7 +65,7 @@ class GoToGoal(Node):
         self.first_iteration = True 
 
         self.ang_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-1.4, 1.4))
-        self.dist_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-0.1, 0.1))
+        self.dist_pid = PID(1.02, 0, 0.02, setpoint=0, output_limits=(-0.2, 0.2))
 
         super().__init__("go_to_goal")
         # State (for the update_Odometry code)
@@ -113,9 +113,9 @@ class GoToGoal(Node):
 
         curr_time = time.time() # get current time
 
-        waypoint_global_loc = np.array([[.5, 0, 1], # waypoint locations constant
-                                    [.5, .4,  1],
-                                    [ 0, .4, 1]
+        waypoint_global_loc = np.array([[.8, 0, 1], # waypoint locations constant
+                                    [.8, .8,  1],
+                                    [ 0, .8, 1]
                                     ])        
         
         cur_pos_x, cur_pos_y, cur_angle_rad = self.update_Odometry(data) # update the odometry data
@@ -142,12 +142,18 @@ class GoToGoal(Node):
             local_checkpoint_dist_x = local_checkpoint_vec[0]
             local_checkpoint_dist_y = local_checkpoint_vec[1]
             desired_angle = 3*np.pi/2 #another 90 degrees to the left
+        else:    
+            test = 0
+
+            #terminate code -> made it to the end
 
         
         distance_error = local_checkpoint_dist_x #determine distance between robot and checkpoint
 
         local_goal_direction = np.arctan2(local_checkpoint_dist_y,local_checkpoint_dist_x)
         theta_error = local_goal_direction - cur_angle_rad #determine distance between robot and checkpoint
+        theta_error = local_goal_direction
+
         #TODO do i have to wrap theta error???
 
         dist_output = self.dist_pid.measure(distance_error, curr_time) #PID for distance, approaching checkpoint
@@ -159,11 +165,8 @@ class GoToGoal(Node):
         print('-------------------------------')
 
 
+        # go to goal state ----------------------------------------------------------
 
-        # if reached the checkpoint 
-        # if theta_error > 180/np.pi * 3:
-        #     test
-        
         print('local_goal_dir' + str(local_goal_direction))
         # if  theta_error > np.pi/180 * 5: # if the heading of the robot is greater than 5 degrees away from the goal direction
         if theta_error > np.pi/180 * 1:
@@ -182,13 +185,13 @@ class GoToGoal(Node):
             dist_msg = Vector3()
             dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
             ang_msg = Vector3()
-            ang_msg.z = -float(ang_output) # negative for turning ccw
+            ang_msg.z = float(ang_output) # negative for turning ccw
             msg_twist = Twist()
             msg_twist.angular = ang_msg
             self.motor_publisher.publish(msg_twist)  
 
 
-            # go to goal state ----------------------------------------------------------
+            #reached the checkpoint
         elif distance_error < .025: # made it to checkpoint -> set vel = 0
             dist_msg = Vector3()
             dist_msg.x = float(0)
@@ -197,12 +200,12 @@ class GoToGoal(Node):
             msg_twist.linear = dist_msg
             self.motor_publisher.publish(msg_twist)
 
-            if self.first_iteration == True: # wait at checkpoint
-                #stop at the checkpoint for 10 seconds
-                print('Waiting at Checkpoint 2 seconds')
-                time.sleep(2)
-                self.first_iteration = False
-                self.count = self.count + 1 # set count to move toward next checkpoint
+            # if self.first_iteration == True: # wait at checkpoint
+            #stop at the checkpoint for 10 seconds
+            print('Waiting at Checkpoint 5 seconds')
+            time.sleep(5)
+            # self.first_iteration = False
+            self.count = self.count + 1 # set count to move toward next checkpoint
             
 
 
@@ -215,6 +218,7 @@ class GoToGoal(Node):
             msg_twist = Twist()
             msg_twist.linear = dist_msg
             self.motor_publisher.publish(msg_twist)
+            self.first_iteration = True
 
 
         # end go to goal state ----------------------------------------------------------
