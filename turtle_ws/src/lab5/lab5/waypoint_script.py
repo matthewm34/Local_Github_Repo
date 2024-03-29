@@ -84,9 +84,9 @@ class GoToGoal(Node):
         self.globalPos = Point()
 
 
-        self.waypoint_global_loc = np.array([[1, 0, 1], # waypoint locations constant
-                                            [ 1,  2,  1],
-                                            [ 1, 3.5, 1]
+        self.waypoint_global_loc = np.array([[.8, .8, 1], # waypoint locations constant
+                                            [ 0, 1.29,  1],
+                                            [ -0.1, 0.0, 1]
                                             ])       
 
         self.odom_sub = self.create_subscription(
@@ -127,7 +127,7 @@ class GoToGoal(Node):
 
     def odom_callback(self, data):
         goal_pose = PoseStamped()
-        goal_pose.header.frame_id = 'map_sim'
+        goal_pose.header.frame_id = 'map'
         goal_pose.pose.position.x = self.waypoint_global_loc[self.count,0]
         goal_pose.pose.position.y = self.waypoint_global_loc[self.count,1]
         goal_pose.pose.position.z = 0.0
@@ -180,10 +180,10 @@ class GoToGoal(Node):
         distance_error_y = abs(local_checkpoint_dist_y)
         print('distance error X: ' + str(distance_error_x) + 'distance error Y: ' + str(distance_error_y) )
 
-        # if distance_error_x < .05 and distance_error_y < .05:
-        #     print('Waiting at Checkpoint for 5 seconds')
-        #     time.sleep(5)
-        #     self.count = self.count + 1 # update to go to the next checkpoint
+        if distance_error_x < .20 and distance_error_y < .20:
+            print('Waiting at Checkpoint for 5 seconds')
+            time.sleep(10)
+            self.count = self.count + 1 # update to go to the next checkpoint
 
         
         '''

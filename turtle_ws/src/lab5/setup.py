@@ -24,7 +24,7 @@ setup(
             'rotation_script = lab5.rotation_script:main',
             'get_object_range = lab5.get_object_range:main',
             'go_to_goal = lab5.go_to_goal:main',
-            'new_script = lab5.new:main',
+            'waypoint_script = lab5.waypoint_script:main',
         ],
     },
 )
