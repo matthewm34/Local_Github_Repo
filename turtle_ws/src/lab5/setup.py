@@ -20,6 +20,11 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'print_fixed_odometry = lab5.print_fixed_odometry:main',
+            'rotation_script = lab5.rotation_script:main',
+            'get_object_range = lab5.get_object_range:main',
+            'go_to_goal = lab5.go_to_goal:main',
+            'new_script = lab5.new:main',
         ],
     },
 )
