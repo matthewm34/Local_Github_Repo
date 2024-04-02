@@ -84,10 +84,18 @@ class GoToGoal(Node):
         self.globalPos = Point()
 
 
-        self.waypoint_global_loc = np.array([[.8, .8, 1], # waypoint locations constant
+        self.waypoint_global_loc = np.array([[.8, .8, 1], # lab waypoint locations constant
                                             [ 0, 1.29,  1],
                                             [ -0.1, 0.0, 1]
                                             ])       
+
+
+         #teleop to end point 1 then
+        self.waypoint_global_loc = np.array([[1.5, .5, 1], # sim waypoint locations constant
+                                            [ 3.5, .8,  1],
+                                            [ 4.2, .5, 1]
+                                            ])                                          
+                                                                        
 
         self.odom_sub = self.create_subscription(
             Odometry,
