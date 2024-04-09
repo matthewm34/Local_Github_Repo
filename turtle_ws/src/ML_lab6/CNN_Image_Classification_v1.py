@@ -113,49 +113,49 @@ test = 0
 
 
 
+# Sean's Code (Not Necessary) -------------------------------------
+# ### Train classifier
+# knn = cv2.ml.KNearest_create()
+# knn.train(train_data, cv2.ml.ROW_SAMPLE, train_labels)
 
-### Train classifier
-knn = cv2.ml.KNearest_create()
-knn.train(train_data, cv2.ml.ROW_SAMPLE, train_labels)
+# if(__debug__):
+# 	Title_images = 'Original Image'
+# 	Title_resized = 'Image Resized'
+# 	cv2.namedWindow( Title_images, cv2.WINDOW_AUTOSIZE )
 
-if(__debug__):
-	Title_images = 'Original Image'
-	Title_resized = 'Image Resized'
-	cv2.namedWindow( Title_images, cv2.WINDOW_AUTOSIZE )
+# correct = 0.0
+# confusion_matrix = np.zeros((6,6))
 
-correct = 0.0
-confusion_matrix = np.zeros((6,6))
+# k = 7
 
-k = 7
+# for i in range(len(test_lines)):
+#     original_img = cv2.imread(imageDirectory+test_lines[i][0]+".jpg")
+#     test_img = np.array(cv2.resize(cv2.imread(imageDirectory+test_lines[i][0]+".jpg"),(25,33)))
+#     if(__debug__):
+#         cv2.imshow(Title_images, original_img)
+#         cv2.imshow(Title_resized, test_img)
+#         key = cv2.waitKey()
+#         if key==27:    # Esc key to stop
+#             break
+#     test_img = test_img.flatten().reshape(1, 33*25*3)
+#     test_img = test_img.astype(np.float32)
 
-for i in range(len(test_lines)):
-    original_img = cv2.imread(imageDirectory+test_lines[i][0]+".jpg")
-    test_img = np.array(cv2.resize(cv2.imread(imageDirectory+test_lines[i][0]+".jpg"),(25,33)))
-    if(__debug__):
-        cv2.imshow(Title_images, original_img)
-        cv2.imshow(Title_resized, test_img)
-        key = cv2.waitKey()
-        if key==27:    # Esc key to stop
-            break
-    test_img = test_img.flatten().reshape(1, 33*25*3)
-    test_img = test_img.astype(np.float32)
+#     test_label = np.int32(test_lines[i][1])
 
-    test_label = np.int32(test_lines[i][1])
+#     ret, results, neighbours, dist = knn.findNearest(test_img, k)
 
-    ret, results, neighbours, dist = knn.findNearest(test_img, k)
-
-    if test_label == ret:
-        print(str(lines[i][0]) + " Correct, " + str(ret))
-        correct += 1
-        confusion_matrix[np.int32(ret)][np.int32(ret)] += 1
-    else:
-        confusion_matrix[test_label][np.int32(ret)] += 1
+#     if test_label == ret:
+#         print(str(lines[i][0]) + " Correct, " + str(ret))
+#         correct += 1
+#         confusion_matrix[np.int32(ret)][np.int32(ret)] += 1
+#     else:
+#         confusion_matrix[test_label][np.int32(ret)] += 1
         
-        print(str(test_lines[i][0]) + " Wrong, " + str(test_label) + " classified as " + str(ret))
-        print("\tneighbours: " + str(neighbours))
-        print("\tdistances: " + str(dist))
+#         print(str(test_lines[i][0]) + " Wrong, " + str(test_label) + " classified as " + str(ret))
+#         print("\tneighbours: " + str(neighbours))
+#         print("\tdistances: " + str(dist))
 
 
 
-print("\n\nTotal accuracy: " + str(correct/len(test_lines)))
-print(confusion_matrix)
+# print("\n\nTotal accuracy: " + str(correct/len(test_lines)))
+# print(confusion_matrix)
