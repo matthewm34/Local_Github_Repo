@@ -81,7 +81,7 @@ model = Sequential([
 ])
 
 model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
               metrics=['accuracy'])
 
 # ----------------------------------------------Train Model----------------------------------------------
@@ -100,17 +100,21 @@ print('Classification Accuracy: ' +str(test_acc))
 # score = tf.nn.softmax(predictions[0])
 
 # just manually double checking that the accuracy it is saying is correct
-# predictions_values = []
-# for i in range(predictions.shape[0]):
-#      cur_prediction_vec = predictions[i]
-#      index = cur_prediction_vec.argmax(axis=0)
-#      predictions_values.append(index)
-# test = np.array(predictions_values)
-# comparison = test == test_labels #mask for which True is redicted same as test data and False is wrong
-# accuracy = sum(comparison)/len(test_labels)
+predictions_values = []
+for i in range(predictions.shape[0]):
+     cur_prediction_vec = predictions[i]
+     index = cur_prediction_vec.argmax(axis=0)
+     predictions_values.append(index)
+test_predictions = np.array(predictions_values)
+comparison = test_predictions == test_labels #mask for which True is redicted same as test data and False is wrong
+accuracy = sum(comparison)/len(test_labels)
 # print('Accuracy:' + str(accuracy))
+test = 0
 
+#show confusion matrix
+ConfusionMatrixDisplay.from_predictions(test_labels, test_predictions)
+
+test = 0
 #Create confusion matrix and normalizes it over predicted (columns)
 # result = confusion_matrix(test_data, predictions , normalize='pred')
-
 
