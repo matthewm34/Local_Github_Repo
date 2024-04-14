@@ -127,10 +127,10 @@ def get_cropped_image(image, mask, min_area=50, min_size=32, verbose=True):
         return None
 
     largest_contour = max(valid_contours, key=cv2.contourArea)
-    if cv2.contourArea(largest_contour) < 230:
+    if cv2.contourArea(largest_contour) < 260:
         if verbose: print('final contour is too small or too big')
         return None
-
+    
     x, y, w, h = cv2.boundingRect(largest_contour)
 
     # if the contour we found is sort of tilted (we are seeing it from an angle) don't count it
@@ -377,7 +377,7 @@ def train_cnn(train_data, patience=10, plot=True, save_model=True, model_name='C
     input_shape = train_data[0][0].shape
     num_classes = len(np.unique(train_data[:,1]))
 
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=patience)
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=patience, min_delta=0.001)
     model = create_cnn(input_shape, num_classes, lr=0.0001, grayscale=grayscale)
 
     x_train = []

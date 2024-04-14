@@ -6,7 +6,7 @@ from image_utils import *
 def main():
     imageDirs = ['2023Fimgs','S2023_imgs','2022Fimgs','2022Fheldout']
     # imageDirs = ['2024Simgs/']
-    grayscale = True
+    grayscale = False
                 
     train_data = None
 
