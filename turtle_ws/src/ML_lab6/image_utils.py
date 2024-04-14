@@ -46,7 +46,7 @@ def crop_to_largest_cluster(image, mask):
     return image  # Return original if no contours found
 
 
-def get_cropped_image(image, mask, min_area=50, min_size=64, verbose=True):
+def get_cropped_image(image, mask, min_area=50, min_size=32, verbose=True):
     # Find contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -238,7 +238,7 @@ def check_extension(imageDir):
             continue
 
 
-def get_dataset(imageDir, train=False):
+def get_dataset(imageDir, train=False, grayscale=False):
     data_list = []
     
     with open(imageDir + 'labels.txt', 'r') as f:
@@ -258,15 +258,17 @@ def get_dataset(imageDir, train=False):
                 # if we didn't detect a sign, but the label is a sign, don't include in dataset (case 1)
                 skip_count += 1
                 continue
-
             if (not no_change_flag and int(label) == 0):
                 # if we detected a sign, but the label is not a sign, don't include in dataset (case 2)
                 filtered_img = cv2.resize(img, (64,64))
                 mislabel_count += 1
                 continue
-
         else:
             filtered_img, _ = filter_img(img) # either a 64x64x3 image of sign or just the original image
+
+        if grayscale:
+            filtered_img = cv2.cvtColor(filtered_img, cv2.COLOR_BGR2GRAY)
+
         data_list.append((filtered_img, int(label)))
     
     if train:
@@ -278,9 +280,9 @@ def get_dataset(imageDir, train=False):
     return data_list
 
 
-def get_train_data(imgDir, val_split=False):
+def get_train_data(imgDir, val_split=False, grayscale=False):
 
-    data_list = get_dataset(imgDir, train=True)
+    data_list = get_dataset(imgDir, train=True, grayscale=grayscale)
 
     if val_split:
     # divide data into test, val, and training set (20 / 16 / 64 split)
@@ -297,17 +299,17 @@ def get_train_data(imgDir, val_split=False):
         return np.array(data_list,dtype=object)
 
 
-def get_test_data(imgDir):
+def get_test_data(imgDir, grayscale=False):
     with open(imgDir + 'labels.txt', 'r') as f:
         reader = csv.reader(f)
         lines = list(reader)
     ext = check_extension(imgDir)
 
-    data_list = get_dataset(imgDir)
+    data_list = get_dataset(imgDir, grayscale=grayscale)
     return np.array(data_list,dtype=object), lines, ext
 
 
-def create_cnn(input_shape, num_classes, lr=0.00001):
+def create_cnn(input_shape, num_classes, lr=0.00001, grayscale=False):
 #     model = Sequential([
 #         layers.Rescaling(1./255, input_shape=input_shape), #this layer normalized the pixel values
 # #         layers.Conv2D(16, 3, input_shape=input_shape, padding='same', 
@@ -326,22 +328,40 @@ def create_cnn(input_shape, num_classes, lr=0.00001):
 #         layers.Dense(num_classes) #output classification for the 6 classes
 #     ])
     
-    model = Sequential([
-        layers.Rescaling(1./255, input_shape=input_shape),
-        layers.Conv2D(32, (3,3), padding='same', activation='relu', input_shape=input_shape,
-                            kernel_regularizer=l2(0.01)),
-        layers.MaxPooling2D((2,2)),
-        layers.Dropout(0.3),
-        layers.Conv2D(64, (3,3), padding='same', activation='relu', input_shape=input_shape,
-                            kernel_regularizer=l2(0.01)),
-        layers.MaxPooling2D((2,2)),
-        layers.Dropout(0.3),
-        layers.Flatten(),
-        layers.Dense(32, activation='relu'),
-        layers.Dense(16, activation='relu'),
-        # layers.Dropout(0.3),
-        layers.Dense(num_classes)
-    ])
+    if grayscale:
+        model = Sequential([
+            layers.Rescaling(1./255, input_shape=input_shape),
+            layers.Conv1D(32, 3, padding='same', activation='relu', input_shape=input_shape,
+                                kernel_regularizer=l2(0.01)),
+            layers.MaxPooling1D(2),
+            layers.Dropout(0.3),
+            layers.Conv1D(64, 3, padding='same', activation='relu', input_shape=input_shape,
+                                kernel_regularizer=l2(0.01)),
+            layers.MaxPooling1D(2),
+            layers.Dropout(0.3),
+            layers.Flatten(),
+            layers.Dense(32, activation='relu'),
+            layers.Dense(16, activation='relu'),
+            # layers.Dropout(0.3),
+            layers.Dense(num_classes)
+        ])
+    else:
+        model = Sequential([
+            layers.Rescaling(1./255, input_shape=input_shape),
+            layers.Conv2D(32, (3,3), padding='same', activation='relu', input_shape=input_shape,
+                                kernel_regularizer=l2(0.01)),
+            layers.MaxPooling2D((2,2)),
+            layers.Dropout(0.3),
+            layers.Conv2D(64, (3,3), padding='same', activation='relu', input_shape=input_shape,
+                                kernel_regularizer=l2(0.01)),
+            layers.MaxPooling2D((2,2)),
+            layers.Dropout(0.3),
+            layers.Flatten(),
+            layers.Dense(32, activation='relu'),
+            layers.Dense(16, activation='relu'),
+            # layers.Dropout(0.3),
+            layers.Dense(num_classes)
+        ])
     
     model.compile(optimizer=Adam(learning_rate=lr),
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -352,12 +372,12 @@ def create_cnn(input_shape, num_classes, lr=0.00001):
     return model
 
 
-def train_cnn(train_data, patience=10, plot=True, save_model=True, model_name='CNN_model'):
+def train_cnn(train_data, patience=10, plot=True, save_model=True, model_name='CNN_model', grayscale=False):
     input_shape = train_data[0][0].shape
     num_classes = len(np.unique(train_data[:,1]))
 
     es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=patience)
-    model = create_cnn(input_shape, num_classes, lr=0.0001)
+    model = create_cnn(input_shape, num_classes, lr=0.0001, grayscale=grayscale)
 
     x_train = []
     y_train = []
