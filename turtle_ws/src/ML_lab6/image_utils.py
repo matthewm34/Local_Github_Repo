@@ -46,7 +46,7 @@ def crop_to_largest_cluster(image, mask):
     return image  # Return original if no contours found
 
 
-def get_cropped_image(image, mask, min_area=100, min_size=64, verbose=True):
+def get_cropped_image(image, mask, min_area=50, min_size=64, verbose=True):
     # Find contours in the mask
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -55,15 +55,10 @@ def get_cropped_image(image, mask, min_area=100, min_size=64, verbose=True):
         if verbose: print('no contours found.')
         return None 
     
-    # Step 1 - filter by size: 
-    # Remove any contours that are smaller than min_area
-    valid_contours = [contour for contour in contours if cv2.contourArea(contour) >= min_area]
-    if verbose: print(f'after removing by size: {len(valid_contours)} valid contours')
-
-    # Step 2 - filter by centroid vertical location:
+    # Step 1 - filter by centroid vertical location:
     # Remove contours with centroid that are on the top or bottom of image. Most likely just background contours.
     # if there is only one contour left, it might just be very big on the screen, widen the centroid limits
-    if len(valid_contours) == 1:
+    if len(contours) == 1:
         upper_limit = image.shape[0]*.10
         lower_limit = image.shape[0]*.90
     else:
@@ -71,7 +66,7 @@ def get_cropped_image(image, mask, min_area=100, min_size=64, verbose=True):
         lower_limit = image.shape[0]*.75
 
     valid_contours_centroid = []
-    for contour in valid_contours:
+    for contour in contours:
         M = cv2.moments(contour)
         if M["m00"] != 0:
             cy = int(M["m01"] / M["m00"])
@@ -80,22 +75,31 @@ def get_cropped_image(image, mask, min_area=100, min_size=64, verbose=True):
     valid_contours = valid_contours_centroid
     if verbose:  print(f'after removing by vertical centroid: {len(valid_contours)} valid contours')
 
-    # Step 3 - filter by size again:
+    # mask1 = np.zeros(mask.shape, dtype=np.uint8)
+    # cv2.drawContours(mask1, valid_contours, -1, (255), thickness=cv2.FILLED)
+
+    # Step 2 - filter by size:
     # remove again anything that is too small
-    valid_contours = [contour for contour in valid_contours if cv2.contourArea(contour) >= min_area*2]
+    valid_contours = [contour for contour in valid_contours if cv2.contourArea(contour) >= min_area]
     if verbose:  print(f'after removing second size restriction: {len(valid_contours)} valid contours')
 
-    # if we removed the "noisy" contours that are present on the top and bottom of the image due to background color
-    # and we still have multiple contours in the center, there may be too many signs present and we should classify as 0.
-    if len(valid_contours) > 1:
-        if verbose:  print('after removing vertical centroids, too many contours are left')
-        return None
+    # mask2 = np.zeros(mask.shape, dtype=np.uint8)
+    # cv2.drawContours(mask2, valid_contours, -1, (255), thickness=cv2.FILLED)
 
-    # Step 4 - filter by centroid horizontal location:
+    # if there are no valid contours, we are at a wall
+    if not valid_contours:
+        if verbose: print('no valid contours found.')
+        return None
+    
+    # Step 3 - filter by centroid horizontal location:
     # If centroid is too far on the sides of the screen, remove it.
     valid_contours_centroid = []
-    left_limit = image.shape[1]*.05
-    right_limit = image.shape[1]*.95
+    if len(valid_contours) == 1:
+        left_limit = image.shape[1]*.1
+        right_limit = image.shape[1]*.9
+    else:
+        left_limit = image.shape[1]*.2
+        right_limit = image.shape[1]*.8
     
     for contour in valid_contours:
         M = cv2.moments(contour)
@@ -103,28 +107,34 @@ def get_cropped_image(image, mask, min_area=100, min_size=64, verbose=True):
             cx = int(M["m10"] / M["m00"])
             if left_limit < cx < right_limit:
                 valid_contours_centroid.append(contour)
-
     valid_contours = valid_contours_centroid
     if verbose: print(f'after removing by horizontal centroid: {len(valid_contours)} valid contours')
 
-    # if there are too many contours left, it can mean there are too many signs on the screen
-    # and therefore we can classify as just the wall
-    if len(valid_contours) > 3:
-        if verbose: print(f'too many contours found: {len(valid_contours)}')
-        return None
+    if len(valid_contours) > 1:
+        sorted_contours = sorted(valid_contours, key=cv2.contourArea, reverse=True)
+        area_diff = cv2.contourArea(sorted_contours[1]) / cv2.contourArea(sorted_contours[0])
 
-    # if there are no valid contours, we are at a wall
+        # check the area of the two largest contours
+        if area_diff > 0.4:
+            if verbose:  print('the contours left are too similar in size')
+            return None
+
+    # mask3 = np.zeros(mask.shape, dtype=np.uint8)
+    # cv2.drawContours(mask3, valid_contours, -1, (255), thickness=cv2.FILLED)
+
     if not valid_contours:
         if verbose: print('no valid contours found.')
         return None
 
-    # Get the largest contour based on area
     largest_contour = max(valid_contours, key=cv2.contourArea)
+    if cv2.contourArea(largest_contour) < 230:
+        if verbose: print('final contour is too small or too big')
+        return None
 
     x, y, w, h = cv2.boundingRect(largest_contour)
 
     # if the contour we found is sort of tilted (we are seeing it from an angle) don't count it
-    if w < 30 or w < h*.7:
+    if w < h*.7:
         if verbose: print('contour width too small')
         return None
     
@@ -149,10 +159,13 @@ def get_cropped_image(image, mask, min_area=100, min_size=64, verbose=True):
     # Crop the image to desired size
     cropped_image = image[y:y+h, x:x+w]
 
+    # concat_img = cv2.hconcat([mask,mask1,mask2,mask3,mask4])
+    # cv2.imshow('og / size / vert_cent / size compare / horiz_cent', concat_img)
+
     return cropped_image
 
 
-def filter_img(img):
+def filter_img(img, train=False):
     """
     Filter our original image into just the region of interest.
     Crops down to a sign if present, or just a resizing of original image if no signs present.
@@ -194,10 +207,16 @@ def filter_img(img):
 
     if cropped_img is None:
         cropped_img = cv2.resize(img, (64,64))
+        no_change_flag = True
     else:
         cropped_img = cv2.resize(cropped_img, (64,64))
+        no_change_flag = False
 
-    return cropped_img
+    # cv2.imshow('original',img)
+    # cv2.imshow('cropped',cropped_img)
+    # cv2.waitKey(0)
+
+    return cropped_img, no_change_flag
 
 
 def check_extension(imageDir):
@@ -219,7 +238,7 @@ def check_extension(imageDir):
             continue
 
 
-def get_dataset(imageDir):
+def get_dataset(imageDir, train=False):
     data_list = []
     
     with open(imageDir + 'labels.txt', 'r') as f:
@@ -227,21 +246,41 @@ def get_dataset(imageDir):
         lines = list(reader)
 
     ext = check_extension(imageDir)
+    skip_count = 0
+    mislabel_count = 0
         
     for i, label in lines:
         # read in image and filter out to region of interest
         img = np.array(cv2.imread(f'{imageDir}{i}.{ext}'))
-        filtered_img = filter_img(img) # either a 64x64x3 image of sign or just the original image
+        if train:
+            filtered_img, no_change_flag = filter_img(img)
+            if (no_change_flag and int(label) != 0):
+                # if we didn't detect a sign, but the label is a sign, don't include in dataset (case 1)
+                skip_count += 1
+                continue
+
+            if (not no_change_flag and int(label) == 0):
+                # if we detected a sign, but the label is not a sign, don't include in dataset (case 2)
+                filtered_img = cv2.resize(img, (64,64))
+                mislabel_count += 1
+                continue
+
+        else:
+            filtered_img, _ = filter_img(img) # either a 64x64x3 image of sign or just the original image
         data_list.append((filtered_img, int(label)))
-            
-    random.shuffle(data_list)
+    
+    if train:
+        random.shuffle(data_list)
+
+    print(f'Total of {skip_count}/{len(lines)} images were skipped due to imperfect cropping.')
+    print(f'Total of {mislabel_count}/{len(lines)} images were relabeled due to imperfect cropping.')
 
     return data_list
 
 
 def get_train_data(imgDir, val_split=False):
 
-    data_list = get_dataset(imgDir)
+    data_list = get_dataset(imgDir, train=True)
 
     if val_split:
     # divide data into test, val, and training set (20 / 16 / 64 split)
@@ -259,8 +298,13 @@ def get_train_data(imgDir, val_split=False):
 
 
 def get_test_data(imgDir):
+    with open(imgDir + 'labels.txt', 'r') as f:
+        reader = csv.reader(f)
+        lines = list(reader)
+    ext = check_extension(imgDir)
+
     data_list = get_dataset(imgDir)
-    return np.array(data_list,dtype=object)
+    return np.array(data_list,dtype=object), lines, ext
 
 
 def create_cnn(input_shape, num_classes, lr=0.00001):
@@ -346,7 +390,7 @@ def train_cnn(train_data, patience=10, plot=True, save_model=True, model_name='C
     return model
 
 
-def test_model(test_data, model, visualize=False):
+def test_model(lines, imageDir, ext, test_data, model, visualize=False, only_false=False):
     x_test = []
     y_test = []
 
@@ -362,7 +406,11 @@ def test_model(test_data, model, visualize=False):
 
     if visualize:
         for i, img in enumerate(x_test):
-            cv2.imshow("Original image", img)
+            if only_false and y_test[i] == pred[i]:
+                continue
+            og_img = np.array(cv2.imread(f'{imageDir}{lines[i][0]}.{ext}'))
+            cv2.imshow("Original image", og_img)
+            cv2.imshow("Cropped image", img)
             print('--------------------------')
             print(f'True label: {y_test[i]}')
             print(f'Prediction: {pred[i]}')
