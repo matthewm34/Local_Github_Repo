@@ -1,6 +1,4 @@
-import math
 import random
-import PIL
 import csv
 import os
 
@@ -10,11 +8,9 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 
 import tensorflow as tf
-from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
-from keras.models import load_model
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from keras.callbacks import EarlyStopping
 from keras.regularizers import l2
@@ -240,19 +236,31 @@ def get_dataset(imageDir):
             
     random.shuffle(data_list)
 
-    # divide data into test, val, and training set (20 / 16 / 64 split)
-    train_ind = range(len(data_list))
-    test_ind = random.sample(train_ind, int(len(train_ind)*0.2))
-    train_ind = [item for item in train_ind if item not in test_ind]
-    val_ind = random.sample(train_ind, int(len(train_ind)*0.2))
-    train_ind = [item for item in train_ind if item not in val_ind]
+    return data_list
 
-    # convert from list into numpy array
-    test_trials = np.array(data_list,dtype=object)[test_ind]
-    val_trials = np.array(data_list,dtype=object)[val_ind]
-    train_trials = np.array(data_list,dtype=object)[train_ind]
-    
-    return test_trials, val_trials, train_trials
+
+def get_train_data(imgDir, val_split=False):
+
+    data_list = get_dataset(imgDir)
+
+    if val_split:
+    # divide data into test, val, and training set (20 / 16 / 64 split)
+        train_ind = range(len(data_list))
+        val_ind = random.sample(train_ind, int(len(train_ind)*0.2))
+        train_ind = [item for item in train_ind if item not in val_ind]
+
+        # convert from list into numpy array
+        val_trials = np.array(data_list,dtype=object)[val_ind]
+        train_trials = np.array(data_list,dtype=object)[train_ind]
+        
+        return train_trials, val_trials
+    else:
+        return np.array(data_list,dtype=object)
+
+
+def get_test_data(imgDir):
+    data_list = get_dataset(imgDir)
+    return np.array(data_list,dtype=object)
 
 
 def create_cnn(input_shape, num_classes, lr=0.00001):
@@ -287,10 +295,9 @@ def create_cnn(input_shape, num_classes, lr=0.00001):
         layers.Flatten(),
         layers.Dense(32, activation='relu'),
         layers.Dense(16, activation='relu'),
-        layers.Dropout(0.3),
+        # layers.Dropout(0.3),
         layers.Dense(num_classes)
     ])
-    
     
     model.compile(optimizer=Adam(learning_rate=lr),
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -301,32 +308,24 @@ def create_cnn(input_shape, num_classes, lr=0.00001):
     return model
 
 
-def train_cnn(train_data, val_data, plot=True):
+def train_cnn(train_data, patience=10, plot=True, save_model=True, model_name='CNN_model'):
     input_shape = train_data[0][0].shape
     num_classes = len(np.unique(train_data[:,1]))
 
-    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=20)
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=patience)
     model = create_cnn(input_shape, num_classes, lr=0.0001)
 
     x_train = []
     y_train = []
-    x_val = []
-    y_val = []
 
     for data, label in train_data:
         x_train.append(data)
         y_train.append(label)
 
-    for data, label in val_data:
-        x_val.append(data)
-        y_val.append(label)    
-
     x_train = np.array(x_train, dtype=object).astype(np.float32)
     y_train = np.array(y_train, dtype=object).astype(np.float32)
-    x_val = np.array(x_val, dtype=object).astype(np.float32)
-    y_val = np.array(y_val, dtype=object).astype(np.float32)
 
-    history = model.fit(x_train, y_train, epochs=500, batch_size=32, validation_data=(x_val, y_val), 
+    history = model.fit(x_train, y_train, epochs=500, batch_size=32, validation_split=0.2, 
                         callbacks=[es])
     
     if plot:
@@ -340,10 +339,14 @@ def train_cnn(train_data, val_data, plot=True):
         plt.legend()
         plt.show()
 
+    if save_model:
+        print(f'Model saved as {model_name}.h5')
+        model.save(f'{model_name}.h5')
+
     return model
 
 
-def test_model(test_data, model):
+def test_model(test_data, model, visualize=False):
     x_test = []
     y_test = []
 
@@ -354,9 +357,17 @@ def test_model(test_data, model):
     x_test = np.array(x_test)
     y_test = np.array(y_test)
 
-
     pred = model.predict(x_test)
-    pred = np.argmax(pred, axis=-1)    
+    pred = np.argmax(pred, axis=-1)
+
+    if visualize:
+        for i, img in enumerate(x_test):
+            cv2.imshow("Original image", img)
+            print('--------------------------')
+            print(f'True label: {y_test[i]}')
+            print(f'Prediction: {pred[i]}')
+            print(f'Result: {y_test[i] == pred[i]}')
+            cv2.waitKey(0)
 
     test_acc = len(np.where(pred == y_test)[0])/len(y_test)
     result = confusion_matrix(y_test, pred)
