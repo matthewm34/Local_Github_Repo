@@ -165,7 +165,7 @@ def get_cropped_image(image, mask, min_area=50, min_size=32, verbose=True):
     return cropped_image
 
 
-def filter_img(img, train=False):
+def filter_img(img):
     """
     Filter our original image into just the region of interest.
     Crops down to a sign if present, or just a resizing of original image if no signs present.
@@ -238,10 +238,10 @@ def check_extension(imageDir):
             continue
 
 
-def get_dataset(imageDir, train=False, grayscale=False):
+def get_dataset(imageDir, train=False, grayscale=False, verbose=False):
     data_list = []
     
-    with open(imageDir + 'labels.txt', 'r') as f:
+    with open(imageDir + '/labels.txt', 'r') as f:
         reader = csv.reader(f)
         lines = list(reader)
 
@@ -251,7 +251,7 @@ def get_dataset(imageDir, train=False, grayscale=False):
         
     for i, label in lines:
         # read in image and filter out to region of interest
-        img = np.array(cv2.imread(f'{imageDir}{i}.{ext}'))
+        img = np.array(cv2.imread(f'{imageDir}/{i}.{ext}'))
         if train:
             filtered_img, no_change_flag = filter_img(img)
             if (no_change_flag and int(label) != 0):
@@ -274,15 +274,16 @@ def get_dataset(imageDir, train=False, grayscale=False):
     if train:
         random.shuffle(data_list)
 
-    print(f'Total of {skip_count}/{len(lines)} images were skipped due to imperfect cropping.')
-    print(f'Total of {mislabel_count}/{len(lines)} images were relabeled due to imperfect cropping.')
+    if verbose:
+        print(f'Total of {skip_count}/{len(lines)} images were skipped due to imperfect cropping.')
+        print(f'Total of {mislabel_count}/{len(lines)} images were relabeled due to imperfect cropping.')
 
     return data_list
 
 
 def get_train_data(imgDir, val_split=False, grayscale=False):
 
-    data_list = get_dataset(imgDir, train=True, grayscale=grayscale)
+    data_list = get_dataset(imgDir, train=True, grayscale=grayscale, verbose=True)
 
     if val_split:
     # divide data into test, val, and training set (20 / 16 / 64 split)
@@ -300,7 +301,7 @@ def get_train_data(imgDir, val_split=False, grayscale=False):
 
 
 def get_test_data(imgDir, grayscale=False):
-    with open(imgDir + 'labels.txt', 'r') as f:
+    with open(imgDir + '/labels.txt', 'r') as f:
         reader = csv.reader(f)
         lines = list(reader)
     ext = check_extension(imgDir)
@@ -404,6 +405,8 @@ def train_cnn(train_data, patience=10, plot=True, save_model=True, model_name='C
         plt.show()
 
     if save_model:
+        if grayscale:
+            model_name = f'{model_name}_GS'
         print(f'Model saved as {model_name}.h5')
         model.save(f'{model_name}.h5')
 
@@ -428,7 +431,7 @@ def test_model(lines, imageDir, ext, test_data, model, visualize=False, only_fal
         for i, img in enumerate(x_test):
             if only_false and y_test[i] == pred[i]:
                 continue
-            og_img = np.array(cv2.imread(f'{imageDir}{lines[i][0]}.{ext}'))
+            og_img = np.array(cv2.imread(f'{imageDir}/{lines[i][0]}.{ext}'))
             cv2.imshow("Original image", og_img)
             cv2.imshow("Cropped image", img)
             print('--------------------------')
