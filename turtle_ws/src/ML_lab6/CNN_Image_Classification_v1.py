@@ -8,6 +8,7 @@ import numpy as np
 import random
 
 import matplotlib as plt
+import matplotlib.pyplot as pyplot
 import numpy as np
 import PIL
 import tensorflow as tf
@@ -63,7 +64,97 @@ test_labels = np.array([np.int32(test_lines[i][1]) for i in range(len(test_lines
 # val_labels = train_labels[math.floor(len(train_lines)*.8):]
 # train_labels = train_labels[:math.floor(len(train_lines)*.8)]
 
+#try preprocessing the training data with grayscaale 
+# weights = np.array([0.2989, 0.5870, 0.1140])
+# train_data = np.dot(train_data[...,:3], weights)
+
 num_classes = len(np.unique(train_labels)) # number of different classification classes
+
+# ----------------------------------------------- Preprocessing -----------------------------------------------
+#  
+img_train_stack = []
+for i in range(train_data.shape[0]): # for each image
+  cur_image = train_data[i,:,:,:] #get image of shape 308, 410, 3
+  
+  # cv2.imshow('OG Image', cur_image) # show current image
+  hsv_cur_image = cv2.cvtColor(cur_image, cv2.COLOR_RGB2HSV) #convert rgb to hsv
+  # COLOR_RGB2HSV
+  #define thresholds $ Hue (H): 0 to 179, Saturation (S): 0 to 255, Value (V): 0 to 255
+  lower_green = np.array([36, 70, 70])
+  upper_green = np.array([74, 255, 255])
+
+  #define thresholds
+  lower_blue = np.array([0, 50, 50])
+  upper_blue = np.array([30, 255, 255])
+
+  #define thresholds
+  lower_orange = np.array([115, 100, 100])
+  upper_orange = np.array([145, 255, 255])
+
+  #define thresholds
+  lower_white = np.array([0, 0, 100])
+  upper_white = np.array([255, 100, 255])
+
+  #mask
+  mask_green = cv2.inRange(hsv_cur_image, lower_green, upper_green)
+  mask_blue = cv2.inRange(hsv_cur_image, lower_blue, upper_blue)
+  mask_orange = cv2.inRange(hsv_cur_image, lower_orange, upper_orange)
+  white_mask = cv2.inRange(hsv_cur_image, lower_white, upper_white)
+
+  # cv2.imshow('Green Parts Only', mask_green)
+  # cv2.imshow('Blue Parts Only', mask_blue)
+  # cv2.imshow('Orange Parts Only', mask_orange)
+  # cv2.imshow('White Parts Only', white_mask)
+
+  cur_stack = np.stack((mask_green,mask_blue,mask_orange),axis=2)
+  img_train_stack.append(cur_stack)
+  #find anything that is blue green or orange
+  test = 0
+
+train_data = np.stack(img_train_stack,axis=0)
+
+img_test_stack = []
+for i in range(test_data.shape[0]): # for each image
+  cur_image = test_data[i,:,:,:] #get image of shape 308, 410, 3
+  
+  # cv2.imshow('OG Image', cur_image) # show current image
+  hsv_cur_image = cv2.cvtColor(cur_image, cv2.COLOR_RGB2HSV) #convert rgb to hsv
+  # COLOR_RGB2HSV
+  #define thresholds $ Hue (H): 0 to 179, Saturation (S): 0 to 255, Value (V): 0 to 255
+  lower_green = np.array([36, 70, 70])
+  upper_green = np.array([74, 255, 255])
+
+  #define thresholds
+  lower_blue = np.array([0, 50, 50])
+  upper_blue = np.array([30, 255, 255])
+
+  #define thresholds
+  lower_orange = np.array([115, 100, 100])
+  upper_orange = np.array([145, 255, 255])
+
+  #define thresholds
+  lower_white = np.array([0, 0, 100])
+  upper_white = np.array([255, 100, 255])
+
+  #mask
+  mask_green = cv2.inRange(hsv_cur_image, lower_green, upper_green)
+  mask_blue = cv2.inRange(hsv_cur_image, lower_blue, upper_blue)
+  mask_orange = cv2.inRange(hsv_cur_image, lower_orange, upper_orange)
+  white_mask = cv2.inRange(hsv_cur_image, lower_white, upper_white)
+
+  # cv2.imshow('Green Parts Only', mask_green)
+  # cv2.imshow('Blue Parts Only', mask_blue)
+  # cv2.imshow('Orange Parts Only', mask_orange)
+  # cv2.imshow('White Parts Only', white_mask)
+
+  cur_stack = np.stack((mask_green,mask_blue,mask_orange),axis=2)
+  img_test_stack.append(cur_stack)
+  #find anything that is blue green or orange
+  test = 0
+
+test_data = np.stack(img_test_stack,axis=0)
+
+
 
 # ---------------------------------------------- Model Architecture ----------------------------------------------
 model = Sequential([
@@ -86,7 +177,7 @@ model.compile(optimizer='adam',
 
 # ----------------------------------------------Train Model----------------------------------------------
 print('Training Model...')
-epochs = 15
+epochs = 7
 # train_history = model.fit(train_data, train_labels, epochs=epochs, validation_data =(test_data, test_labels))
 train_history = model.fit(train_data, train_labels, epochs=epochs)
 
