@@ -81,7 +81,7 @@ class GoToGoal(Node):
         self.globalPos = Point()
 
         self.label = 0
-        self.dist = 0
+        self.dist = 10
 
         self.odom_sub = self.create_subscription(
             Odometry,

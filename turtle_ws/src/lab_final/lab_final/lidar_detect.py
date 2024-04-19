@@ -68,6 +68,8 @@ class LidarDetect(Node):
         self.lidar_data = masked_lidar
         self.lidar_angles = masked_lidar_angles
 
+        print(self.lidar_data)
+
         ## DISTANCE CALCULATION
         # find the index closest to our error angle
         closest_dist = np.argmin(self.lidar_data)
