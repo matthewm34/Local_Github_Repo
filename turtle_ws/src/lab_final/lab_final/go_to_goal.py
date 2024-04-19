@@ -79,17 +79,14 @@ class GoToGoal(Node):
         self.Init_ang = 0.0
         self.globalPos = Point()
 
+        self.label = 0
+
         self.odom_sub = self.create_subscription(
             Odometry,
             '/odom',
             self.odom_callback,
             1)
         self.odom_sub  # prevent unused variable warning
-
-        
-        # self.lidar_data = []
-        # self.lidar_angles = []
-        # self.lidar_deg_inc = None
 
         #Set up QoS Profiles for passing images over WiFi
         image_qos_profile = QoSProfile(
@@ -106,8 +103,9 @@ class GoToGoal(Node):
             self.range_callback,
             image_qos_profile
         )
+
+        self.sign_subscriber = self.create_subscription(Point, '/sign_detect', self.sign_callback)
         
-       
         # create publiher for the Twist motor command
         self.motor_publisher = self.create_publisher(Twist, '/cmd_vel', 10) 
 
@@ -127,15 +125,11 @@ class GoToGoal(Node):
 
         print('-------------------------------')
         print(f'Go to goal check: {self.GoGoal}')
-
-
-
         
         local_checkpoint_vec = transformation_matrix.I @ waypoint_global_loc[0,:].reshape(-1,1)
         local_checkpoint_dist_x = local_checkpoint_vec[0]
         local_checkpoint_dist_y = local_checkpoint_vec[1]
         desired_angle = np.pi/2 #straight ahead
-
 
         # ----------------------- IMAGE DETECTION STATE -----------------------
         if not self.GoGoal: 
@@ -144,40 +138,28 @@ class GoToGoal(Node):
             dist_msg = Vector3()
             dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
             ang_msg = Vector3()
-            ang_msg.z = float(turnSpeed)
+            ang_msg.z = float(0)
             msg_twist = Twist()
             msg_twist.linear = dist_msg
             msg_twist.angular = ang_msg
             self.motor_publisher.publish(msg_twist)
 
-            
-            # take picture
-            br = CvBridge()
-            img_raw = br.compressed_imgmsg_to_cv2(msg, "bgr8")
-            img_hsv = cv2.cvtColor(img_raw, cv2.COLOR_BGR2HSV)
-
-            #NOTE: change global x and y checkpoint depending on the sign label
-            #waypoint_global_loc = np.array([[1.5, 0, 1]])
 
             # Classify Image
-            label = x # code here to input image and output classifcation
-                        #labels: 0: empty wall, 1: left, 2: right, 3: do not enter, 4: stop, 5: goal.
+            label = self.label
+
+            # labels: 0: empty wall, 1: left, 2: right, 3: do not enter, 4: stop, 5: goal.
             if label == 0: # (empty wall)
                 None
             elif label == 1: #(left arrow -> turn left 90 degrees)
-                None
-            
+                self.Init = True
             elif label == 2: #(right arrow -> turn right 90 degrees)
-                None
+                self.Init = True
             elif label == 3 or label == 4: #(stop or do not enter -> turn around 180 degrees)
-                None
+                self.Init = True
             elif label == 5: #(star -> reached goal)
                 None    #command motors do not move, pause code
-
-
-            
          
-
         else: # -------------------------------- Go to checkpoint -------------------------------- 
             print('in go to next checkpoint mode')
             
@@ -186,8 +168,6 @@ class GoToGoal(Node):
             local_goal_direction = np.arctan2(local_checkpoint_dist_y,local_checkpoint_dist_x)
             theta_error = local_goal_direction - cur_angle_rad #determine distance between robot and checkpoint
             theta_error = local_goal_direction
-
-            #TODO do i have to wrap theta error???
 
             dist_output = self.dist_pid.measure(distance_error, curr_time) #PID for distance, approaching checkpoint
             ang_output = self.ang_pid.measure(theta_error, curr_time) #PID for rotating 90 degrees, once reached checkpoint
@@ -242,6 +222,10 @@ class GoToGoal(Node):
                 self.first_iteration = True
 
 
+    def sign_callback(self, data):
+        self.label = int(data.x)
+
+
     def update_Odometry(self,Odom):
         position = Odom.pose.pose.position
         
@@ -272,6 +256,7 @@ class GoToGoal(Node):
         return cur_pos_x, cur_pos_y, cur_angle_rad #all of type float
 
 
+
     def range_callback(self, msg):
         center = msg.x # index of the range vector at which the minimum distane of the "obstacle" is at
         range = msg.y # length of the lidar vector from -90 to 90 degrees
@@ -296,6 +281,7 @@ class GoToGoal(Node):
                 else:
                     # turn counter clockwise until center is below 10
                     self.turnDir = 'CCW'
+
 
 
     
