@@ -112,9 +112,12 @@ class GoToGoal(Node):
         self.motor_publisher = self.create_publisher(Twist, '/cmd_vel', 10) 
 
         self.waypoint_global_loc = np.array([[1.5, 0, 1]]) 
+        self.goal_reached = False
 
 
     def odom_callback(self, data):
+        if self.goal_reached:
+            return
 
         curr_time = time.time() # get current time
      
@@ -157,6 +160,7 @@ class GoToGoal(Node):
             if label == 0: # (empty wall)
                 self.Init = True
                 print('wall reached')
+                self.waypoint_global_loc = np.array([[-8, 0, 1]])
             elif label == 1: #(left arrow -> turn left 90 degrees)
                 self.Init = True
                 self.waypoint_global_loc = np.array([[0, 8, 1]])
@@ -167,7 +171,8 @@ class GoToGoal(Node):
                 self.Init = True
                 self.waypoint_global_loc = np.array([[-8, 0, 1]])
             elif label == 5: #(star -> reached goal)
-                None    #command motors do not move, pause code
+                self.goal_reached = True
+                None    # command motors do not move, pause code
 
             self.GoGoal = True
          
@@ -218,9 +223,8 @@ class GoToGoal(Node):
                 # if self.first_iteration == True: # wait at checkpoint
                 #stop at the checkpoint for 10 seconds
                 print('Waiting at Checkpoint 5 seconds')
-                time.sleep(5)
+                time.sleep(2)
                 # self.first_iteration = False
-                self.count = self.count + 1 # set count to move toward next checkpoint
 
             else: #if not at checkpoint -> move forward 
                 # publish motor commands
@@ -249,7 +253,7 @@ class GoToGoal(Node):
         q = Odom.pose.pose.orientation
         orientation = np.arctan2(2*(q.w*q.z+q.x*q.y),1-2*(q.y*q.y+q.z*q.z))
 
-        if self.Init:
+        if self.Init:   
             #The initial data is stored to by subtracted to all the other values as we want to start at position (0,0) and orientation 0
             self.Init = False
             self.Init_ang = orientation

@@ -246,15 +246,17 @@ class DetectSign(Node):
         cv2.imshow('image',img_raw)
         cv2.waitKey(1)
 
-
-        img = np.array(filter_img(img_raw))
-        pred = self.model.predict(img)
-        print(pred)
+        test = []
+        img = filter_img(img_raw)
+        test.append(img[0])
+        pred = self.model.predict(np.array(test), verbose=0)
+        pred = np.argmax(pred, axis=-1)
+        print(pred[0])
 
         ## ======= PUBLISHING ========
         msg_coord = Point()
-        msg_coord.x = float(pred)
-        self.coord_publisher.publish(msg_coord)
+        msg_coord.x = float(pred[0])
+        self.sign_publisher.publish(msg_coord)
 
 
 def main():
