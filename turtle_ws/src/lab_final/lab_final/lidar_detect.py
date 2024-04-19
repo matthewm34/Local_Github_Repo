@@ -70,7 +70,7 @@ class LidarDetect(Node):
 
         ## DISTANCE CALCULATION
         # find the index closest to our error angle
-        closest_dist = np.min(self.lidar_data)
+        closest_dist = np.nanmin(self.lidar_data)
 
         msg_dist = Point()
         msg_dist.z = float(closest_dist)
