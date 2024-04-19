@@ -139,6 +139,9 @@ class GoToGoal(Node):
         local_checkpoint_dist_x = local_checkpoint_vec[0]
         local_checkpoint_dist_y = local_checkpoint_vec[1]
 
+        print(f'local checkpoint: {local_checkpoint_dist_x}, {local_checkpoint_dist_y}')
+        print(f'current position: {cur_pos_x}, {cur_pos_y}, {cur_angle_rad}')
+
 
         if self.dist < 0.4:
             self.GoGoal = False
