@@ -146,7 +146,7 @@ class GoToGoal(Node):
         if self.dist < 0.6:
             self.GoGoal = False
 
-        euc_dist = np.linalg.norm(np.array([local_checkpoint_dist_x[0], local_checkpoint_dist_y[0]])-np.array([cur_pos_x, cur_pos_y]))
+        euc_dist = np.linalg.norm([local_checkpoint_dist_x[0], local_checkpoint_dist_y[0]])
         print(euc_dist)
         if euc_dist > 7.75:
             self.GoGoal = True
