@@ -20,11 +20,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'run_cnn = lab_final.run_cnn:main',
-            'train_cnn = lab_final.train_cnn:main',
             'image_utils = lab_final.image_utils:main',
             'rotation_script = lab_final.rotation_script:main',
-            'get_object_range = lab_final.get_object_range:main',
+            'sign_detect = lab_final.sign_detect:main',
+            'lidar_detect = lab_final.lidar_detect:main',
             'go_to_goal = lab_final.go_to_goal:main',
         ],
     },

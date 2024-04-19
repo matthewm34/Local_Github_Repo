@@ -31,8 +31,13 @@ class DetectSign(Node):
         br = CvBridge()
         img_raw = br.compressed_imgmsg_to_cv2(msg, "bgr8")
 
+        cv2.imshow('image',img_raw)
+        cv2.waitKey(1)
+
+
         img = np.array(filter_img(img_raw))
         pred = self.model.predict(img)
+        print(pred)
 
         ## ======= PUBLISHING ========
         msg_coord = Point()
