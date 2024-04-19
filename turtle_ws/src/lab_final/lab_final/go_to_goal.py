@@ -114,6 +114,7 @@ class GoToGoal(Node):
 
         self.waypoint_global_loc = np.array([[1.5, 0, 1]]) 
         self.goal_reached = False
+        self.current_state = 'Go forward'
 
 
     def odom_callback(self, data):
@@ -131,6 +132,7 @@ class GoToGoal(Node):
         print('-------------------------------')
         print(f'Go to goal check: {self.GoGoal}')
         print(f'current label: {self.label}')
+        print(f'current state: {self.current_state}')
         
         local_checkpoint_vec = transformation_matrix.I @ self.waypoint_global_loc[0,:].reshape(-1,1)
         local_checkpoint_dist_x = local_checkpoint_vec[0]
@@ -160,24 +162,30 @@ class GoToGoal(Node):
             if label == 0: # (empty wall)
                 self.Init = True
                 print('wall reached')
+                self.current_state = 'Empty wall'
                 self.waypoint_global_loc = np.array([[-8, 0, 1]])
             elif label == 1: #(left arrow -> turn left 90 degrees)
                 self.Init = True
+                self.current_state = 'Left arrow'
                 self.waypoint_global_loc = np.array([[0, 8, 1]])
             elif label == 2: #(right arrow -> turn right 90 degrees)
                 self.Init = True
+                self.current_state = 'Right arrow'
                 self.waypoint_global_loc = np.array([[0, -8, 1]])
             elif label == 3 or label == 4: #(stop or do not enter -> turn around 180 degrees)
                 self.Init = True
+                self.current_state = 'Turn around'
                 self.waypoint_global_loc = np.array([[-8, 0, 1]])
             elif label == 5: #(star -> reached goal)
                 self.goal_reached = True
+                self.current_state = 'Goal'
                 None    # command motors do not move, pause code
 
             self.GoGoal = True
          
         else: # -------------------------------- Go to checkpoint -------------------------------- 
             print('in go to next checkpoint mode')
+            self.current_state = 'Go forward'
             
             distance_error = local_checkpoint_dist_x #determine distance between robot and checkpoint
 
