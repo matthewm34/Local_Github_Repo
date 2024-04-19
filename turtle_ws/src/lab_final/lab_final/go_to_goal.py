@@ -133,6 +133,7 @@ class GoToGoal(Node):
         print(f'Go to goal check: {self.GoGoal}')
         print(f'current label: {self.label}')
         print(f'current state: {self.current_state}')
+        print(f'lidar distance: {self.dist}')
         
         local_checkpoint_vec = transformation_matrix.I @ self.waypoint_global_loc[0,:].reshape(-1,1)
         local_checkpoint_dist_x = local_checkpoint_vec[0]
@@ -180,6 +181,9 @@ class GoToGoal(Node):
                 self.goal_reached = True
                 self.current_state = 'Goal'
                 None    # command motors do not move, pause code
+
+            print('Waiting at image detection 5 seconds')
+            time.sleep(5)
 
             self.GoGoal = True
          
@@ -250,7 +254,7 @@ class GoToGoal(Node):
 
 
     def dist_callback(self, data):
-        self.dist = int(data.z)
+        self.dist = data.z
 
 
     def update_Odometry(self,Odom):
