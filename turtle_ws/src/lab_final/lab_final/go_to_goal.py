@@ -123,7 +123,6 @@ class GoToGoal(Node):
         curr_time = time.time() # get current time
      
         cur_pos_x, cur_pos_y, cur_angle_rad = self.update_Odometry(data) # update the odometry data
-        print(cur_pos_x, cur_pos_y, cur_angle_rad)
         
         transformation_matrix = np.matrix([[np.cos(cur_angle_rad), -np.sin(cur_angle_rad), cur_pos_x],
                                         [np.sin(cur_angle_rad), np.cos(cur_angle_rad), cur_pos_y],
@@ -131,13 +130,14 @@ class GoToGoal(Node):
 
         print('-------------------------------')
         print(f'Go to goal check: {self.GoGoal}')
+        print(f'current label: {self.label}')
         
         local_checkpoint_vec = transformation_matrix.I @ self.waypoint_global_loc[0,:].reshape(-1,1)
         local_checkpoint_dist_x = local_checkpoint_vec[0]
         local_checkpoint_dist_y = local_checkpoint_vec[1]
 
 
-        if self.dist < 0.3:
+        if self.dist < 0.4:
             self.GoGoal = False
 
         # ----------------------- IMAGE DETECTION STATE -----------------------
@@ -152,7 +152,6 @@ class GoToGoal(Node):
             msg_twist.linear = dist_msg
             msg_twist.angular = ang_msg
             self.motor_publisher.publish(msg_twist)
-
 
             # Classify Image
             label = self.label
