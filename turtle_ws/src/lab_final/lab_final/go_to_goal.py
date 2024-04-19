@@ -107,7 +107,7 @@ class GoToGoal(Node):
         # )
 
         self.sign_subscriber = self.create_subscription(Point, '/sign_detect', self.sign_callback, image_qos_profile)
-        self.dist_subscriber = self.create_subscription(Point, '/lidat_dist', self.dist_callback, image_qos_profile)
+        self.dist_subscriber = self.create_subscription(Point, '/lidar_dist', self.dist_callback, image_qos_profile)
         
         # create publiher for the Twist motor command
         self.motor_publisher = self.create_publisher(Twist, '/cmd_vel', 10) 
