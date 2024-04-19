@@ -146,7 +146,7 @@ class GoToGoal(Node):
         if self.dist < 0.6:
             self.GoGoal = False
 
-        if np.linalg.norm([local_checkpoint_dist_x, local_checkpoint_dist_y]-[cur_pos_x, cur_pos_y]) > 7.5:
+        if np.linalg.norm(np.array([local_checkpoint_dist_x, local_checkpoint_dist_y])-np.array([cur_pos_x, cur_pos_y])) > 7.5:
             self.GoGoal = True
 
         # ----------------------- IMAGE DETECTION STATE -----------------------
