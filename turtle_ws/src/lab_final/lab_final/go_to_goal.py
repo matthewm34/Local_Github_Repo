@@ -69,6 +69,7 @@ class GoToGoal(Node):
 
         self.ang_pid = PID(1, 0, 0, setpoint=0, output_limits=(-1.4, 1.4))
         self.dist_pid = PID(1, 0, 0, setpoint=0, output_limits=(-0.2, 0.2))
+        
 
         super().__init__("go_to_goal")
         # State (for the update_Odometry code)
@@ -105,8 +106,8 @@ class GoToGoal(Node):
         #     image_qos_profile
         # )
 
-        self.sign_subscriber = self.create_subscription(Point, '/sign_detect', self.sign_callback)
-        self.dist_subscriber = self.create_subscription(Point, '/lidat_dist', self.dist_callback)
+        self.sign_subscriber = self.create_subscription(Point, '/sign_detect', self.sign_callback, image_qos_profile)
+        self.dist_subscriber = self.create_subscription(Point, '/lidat_dist', self.dist_callback, image_qos_profile)
         
         # create publiher for the Twist motor command
         self.motor_publisher = self.create_publisher(Twist, '/cmd_vel', 10) 

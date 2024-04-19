@@ -78,7 +78,7 @@ class LidarDetect(Node):
 
 
 def main():
-    print('Running get_object_range...')
+    print('Running lidar_detect...')
 
     rclpy.init()
     robot_range= LidarDetect()
