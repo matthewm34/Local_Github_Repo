@@ -80,6 +80,7 @@ class GoToGoal(Node):
         self.globalPos = Point()
 
         self.label = 0
+        self.dist = 0
 
         self.odom_sub = self.create_subscription(
             Odometry,
@@ -96,25 +97,26 @@ class GoToGoal(Node):
 		    depth=1
 		)
         
-        #Subscriber to object_range from get_object_range
-        self.range_subscriber = self.create_subscription(
-            Point,
-            '/object_range/range',
-            self.range_callback,
-            image_qos_profile
-        )
+        # #Subscriber to object_range from get_object_range
+        # self.range_subscriber = self.create_subscription(
+        #     Point,
+        #     '/object_range/range',
+        #     self.range_callback,
+        #     image_qos_profile
+        # )
 
         self.sign_subscriber = self.create_subscription(Point, '/sign_detect', self.sign_callback)
+        self.dist_subscriber = self.create_subscription(Point, '/lidat_dist', self.dist_callback)
         
         # create publiher for the Twist motor command
         self.motor_publisher = self.create_publisher(Twist, '/cmd_vel', 10) 
+
+        self.waypoint_global_loc = np.array([[1.5, 0, 1]]) 
 
 
     def odom_callback(self, data):
 
         curr_time = time.time() # get current time
-
-        waypoint_global_loc = np.array([[1.5, 0, 1]]) # waypoint locations constant
      
         cur_pos_x, cur_pos_y, cur_angle_rad = self.update_Odometry(data) # update the odometry data
         print(cur_pos_x, cur_pos_y, cur_angle_rad)
@@ -126,10 +128,13 @@ class GoToGoal(Node):
         print('-------------------------------')
         print(f'Go to goal check: {self.GoGoal}')
         
-        local_checkpoint_vec = transformation_matrix.I @ waypoint_global_loc[0,:].reshape(-1,1)
+        local_checkpoint_vec = transformation_matrix.I @ self.waypoint_global_loc[0,:].reshape(-1,1)
         local_checkpoint_dist_x = local_checkpoint_vec[0]
         local_checkpoint_dist_y = local_checkpoint_vec[1]
-        desired_angle = np.pi/2 #straight ahead
+
+
+        if self.dist < 0.3:
+            self.GoGoal = False
 
         # ----------------------- IMAGE DETECTION STATE -----------------------
         if not self.GoGoal: 
@@ -150,15 +155,21 @@ class GoToGoal(Node):
 
             # labels: 0: empty wall, 1: left, 2: right, 3: do not enter, 4: stop, 5: goal.
             if label == 0: # (empty wall)
-                None
+                self.Init = True
+                print('wall reached')
             elif label == 1: #(left arrow -> turn left 90 degrees)
                 self.Init = True
+                self.waypoint_global_loc = np.array([[0, 8, 1]])
             elif label == 2: #(right arrow -> turn right 90 degrees)
                 self.Init = True
+                self.waypoint_global_loc = np.array([[0, -8, 1]])
             elif label == 3 or label == 4: #(stop or do not enter -> turn around 180 degrees)
                 self.Init = True
+                self.waypoint_global_loc = np.array([[-8, 0, 1]])
             elif label == 5: #(star -> reached goal)
                 None    #command motors do not move, pause code
+
+            self.GoGoal = True
          
         else: # -------------------------------- Go to checkpoint -------------------------------- 
             print('in go to next checkpoint mode')
@@ -226,6 +237,10 @@ class GoToGoal(Node):
         self.label = int(data.x)
 
 
+    def dist_callback(self, data):
+        self.dist = int(data.z)
+
+
     def update_Odometry(self,Odom):
         position = Odom.pose.pose.position
         
@@ -257,34 +272,31 @@ class GoToGoal(Node):
 
 
 
-    def range_callback(self, msg):
-        center = msg.x # index of the range vector at which the minimum distane of the "obstacle" is at
-        range = msg.y # length of the lidar vector from -90 to 90 degrees
+    # def range_callback(self, msg):
+    #     center = msg.x # index of the range vector at which the minimum distane of the "obstacle" is at
+    #     range = msg.y # length of the lidar vector from -90 to 90 degrees
 
-        if center == 900:
-            # set state to go to goal 
-            self.GoGoal = True
+    #     if center == 900:
+    #         # set state to go to goal 
+    #         self.GoGoal = True
 
-        else: # navigate obstacle
-            self.GoGoal = False
+    #     else: # navigate obstacle
+    #         self.GoGoal = False
 
-            if center < range/2:    # object is on the left side
-                if center < 20:
-                    self.turnDir = None
-                else:
-                    # turn clockwise until center is below 10
-                    self.turnDir = 'CW'
-            else:
-                if center > range-20:
-                    # move forward
-                    self.turnDir = None
-                else:
-                    # turn counter clockwise until center is below 10
-                    self.turnDir = 'CCW'
+    #         if center < range/2:    # object is on the left side
+    #             if center < 20:
+    #                 self.turnDir = None
+    #             else:
+    #                 # turn clockwise until center is below 10
+    #                 self.turnDir = 'CW'
+    #         else:
+    #             if center > range-20:
+    #                 # move forward
+    #                 self.turnDir = None
+    #             else:
+    #                 # turn counter clockwise until center is below 10
+    #                 self.turnDir = 'CCW'
 
-
-
-    
 
 def main():
     print('Running go_to_goal..')
