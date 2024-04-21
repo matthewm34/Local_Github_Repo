@@ -121,11 +121,10 @@ class GoToGoal(Node):
         if self.goal_reached:
             print('goal reached!')
             dist_msg = Vector3()
-            dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
-            ang_msg = Vector3()
-            ang_msg.z = float(ang_output)# positive for turning ccw
+            dist_msg.x = float(0)
+            dist_msg.y = float(0)
             msg_twist = Twist()
-            msg_twist.angular = ang_msg
+            msg_twist.linear = dist_msg
             self.motor_publisher.publish(msg_twist)
         else:
 
