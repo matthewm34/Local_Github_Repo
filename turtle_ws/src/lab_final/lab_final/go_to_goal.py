@@ -119,142 +119,150 @@ class GoToGoal(Node):
 
     def odom_callback(self, data):
         if self.goal_reached:
-            return
-
-        curr_time = time.time() # get current time
-     
-        cur_pos_x, cur_pos_y, cur_angle_rad = self.update_Odometry(data) # update the odometry data
-        
-        transformation_matrix = np.matrix([[np.cos(cur_angle_rad), -np.sin(cur_angle_rad), cur_pos_x],
-                                        [np.sin(cur_angle_rad), np.cos(cur_angle_rad), cur_pos_y],
-                                        [0,                             0,                  1  ]])
-
-        print('-------------------------------')
-        print(f'Go to goal check: {self.GoGoal}')
-        print(f'current label: {self.label}')
-        print(f'current state: {self.current_state}')
-        print(f'lidar distance: {self.dist}')
-        
-        local_checkpoint_vec = transformation_matrix.I @ self.waypoint_global_loc[0,:].reshape(-1,1)
-        local_checkpoint_dist_x = local_checkpoint_vec[0]
-        local_checkpoint_dist_y = local_checkpoint_vec[1]
-
-        print(f'local checkpoint: {local_checkpoint_dist_x}, {local_checkpoint_dist_y}')
-        print(f'current position: {cur_pos_x}, {cur_pos_y}, {cur_angle_rad}')
-
-
-        if self.dist < 0.65:
-            self.GoGoal = False
-
-        euc_dist = np.linalg.norm([local_checkpoint_dist_x[0], local_checkpoint_dist_y[0]])
-        print(euc_dist)
-        if euc_dist > 7.9:
-            self.GoGoal = True
-
-        # ----------------------- IMAGE DETECTION STATE -----------------------
-        if not self.GoGoal: 
-            print('In image detection state')
-            #set all velocity to zero
+            print('goal reached!')
             dist_msg = Vector3()
             dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
             ang_msg = Vector3()
-            ang_msg.z = float(0)
+            ang_msg.z = float(ang_output)# positive for turning ccw
             msg_twist = Twist()
-            msg_twist.linear = dist_msg
             msg_twist.angular = ang_msg
             self.motor_publisher.publish(msg_twist)
+        else:
 
-            # Classify Image
-            label = self.label
-
-            # labels: 0: empty wall, 1: left, 2: right, 3: do not enter, 4: stop, 5: goal.
-            if label == 0: # (empty wall)
-                self.Init = True
-                print('wall reached')
-                self.current_state = 'Empty wall'
-                self.waypoint_global_loc = np.array([[-8, 0, 1]])
-            elif label == 1: #(left arrow -> turn left 90 degrees)
-                self.Init = True
-                self.current_state = 'Left arrow'
-                self.waypoint_global_loc = np.array([[0, 8, 1]])
-            elif label == 2: #(right arrow -> turn right 90 degrees)
-                self.Init = True
-                self.current_state = 'Right arrow'
-                self.waypoint_global_loc = np.array([[0, -8, 1]])
-            elif label == 3 or label == 4: #(stop or do not enter -> turn around 180 degrees)
-                self.Init = True
-                self.current_state = 'Turn around'
-                self.waypoint_global_loc = np.array([[-8, 0, 1]])
-            elif label == 5: #(star -> reached goal)
-                self.goal_reached = True
-                self.current_state = 'Goal'
-                None    # command motors do not move, pause code
-
-            print('Waiting at image detection 5 seconds')
-            time.sleep(2)
-
-            self.GoGoal = True
-         
-        else: # -------------------------------- Go to checkpoint -------------------------------- 
-            print('in go to next checkpoint mode')
-            self.current_state = 'Go forward'
+            curr_time = time.time() # get current time
+        
+            cur_pos_x, cur_pos_y, cur_angle_rad = self.update_Odometry(data) # update the odometry data
             
-            distance_error = local_checkpoint_dist_x #determine distance between robot and checkpoint
+            transformation_matrix = np.matrix([[np.cos(cur_angle_rad), -np.sin(cur_angle_rad), cur_pos_x],
+                                            [np.sin(cur_angle_rad), np.cos(cur_angle_rad), cur_pos_y],
+                                            [0,                             0,                  1  ]])
 
-            local_goal_direction = np.arctan2(local_checkpoint_dist_y,local_checkpoint_dist_x)
-            theta_error = local_goal_direction - cur_angle_rad #determine distance between robot and checkpoint
-            theta_error = local_goal_direction
-
-            dist_output = self.dist_pid.measure(distance_error, curr_time) #PID for distance, approaching checkpoint
-            ang_output = self.ang_pid.measure(theta_error, curr_time) #PID for rotating 90 degrees, once reached checkpoint
+            print('-------------------------------')
+            print(f'Go to goal check: {self.GoGoal}')
+            print(f'current label: {self.label}')
+            print(f'current state: {self.current_state}')
+            print(f'lidar distance: {self.dist}')
             
-            print(f"distance: {distance_error}\nangle: {theta_error}\nPIDdist: {dist_output}")
-            # go to goal state ----------------------------------------------------------
-            # if  theta_error > np.pi/180 * 5: # if the heading of the robot is greater than 5 degrees away from the goal direction
-            if theta_error > np.pi/180 * 2.5:
-                # rotate robot 90 degrees ccw since its at checkpoint
+            local_checkpoint_vec = transformation_matrix.I @ self.waypoint_global_loc[0,:].reshape(-1,1)
+            local_checkpoint_dist_x = local_checkpoint_vec[0]
+            local_checkpoint_dist_y = local_checkpoint_vec[1]
+
+            print(f'local checkpoint: {local_checkpoint_dist_x}, {local_checkpoint_dist_y}')
+            print(f'current position: {cur_pos_x}, {cur_pos_y}, {cur_angle_rad}')
+
+
+            if self.dist < 0.6:
+                self.GoGoal = False
+
+            euc_dist = np.linalg.norm([local_checkpoint_dist_x[0], local_checkpoint_dist_y[0]])
+            print(euc_dist)
+            if euc_dist > 7.9:
+                self.GoGoal = True
+
+            # ----------------------- IMAGE DETECTION STATE -----------------------
+            if not self.GoGoal: 
+                print('In image detection state')
+                #set all velocity to zero
                 dist_msg = Vector3()
                 dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
                 ang_msg = Vector3()
-                ang_msg.z = float(ang_output)# positive for turning ccw
-                msg_twist = Twist()
-                msg_twist.angular = ang_msg
-                self.motor_publisher.publish(msg_twist)
-
-                # elif local_goal_direction < -np.pi/180 * 5:
-            elif theta_error < -np.pi/180 * 2.5:
-                dist_msg = Vector3()
-                dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
-                ang_msg = Vector3()
-                ang_msg.z = float(ang_output) # negative for turning ccw
-                msg_twist = Twist()
-                msg_twist.angular = ang_msg
-                self.motor_publisher.publish(msg_twist)  
-
-                #reached the checkpoint
-            elif distance_error < .025: # made it to checkpoint -> set vel = 0
-                dist_msg = Vector3()
-                dist_msg.x = float(0)
-                dist_msg.y = float(0)
+                ang_msg.z = float(0)
                 msg_twist = Twist()
                 msg_twist.linear = dist_msg
+                msg_twist.angular = ang_msg
                 self.motor_publisher.publish(msg_twist)
 
-                # if self.first_iteration == True: # wait at checkpoint
-                #stop at the checkpoint for 10 seconds
-                print('Waiting at Checkpoint 5 seconds')
+                # Classify Image
+                label = self.label
+
+                # labels: 0: empty wall, 1: left, 2: right, 3: do not enter, 4: stop, 5: goal.
+                if label == 0: # (empty wall)
+                    self.Init = True
+                    print('wall reached')
+                    self.current_state = 'Empty wall'
+                    self.waypoint_global_loc = np.array([[-8, 0, 1]])
+                elif label == 1: #(left arrow -> turn left 90 degrees)
+                    self.Init = True
+                    self.current_state = 'Left arrow'
+                    self.waypoint_global_loc = np.array([[0, 8, 1]])
+                elif label == 2: #(right arrow -> turn right 90 degrees)
+                    self.Init = True
+                    self.current_state = 'Right arrow'
+                    self.waypoint_global_loc = np.array([[0, -8, 1]])
+                elif label == 3 or label == 4: #(stop or do not enter -> turn around 180 degrees)
+                    self.Init = True
+                    self.current_state = 'Turn around'
+                    self.waypoint_global_loc = np.array([[-8, 0, 1]])
+                elif label == 5: #(star -> reached goal)
+                    self.goal_reached = True
+                    self.current_state = 'Goal'
+                    None    # command motors do not move, pause code
+
+                print('Waiting at image detection 5 seconds')
                 time.sleep(2)
-                # self.first_iteration = False
 
-            else: #if not at checkpoint -> move forward 
-                # publish motor commands
-                dist_msg = Vector3()
-                dist_msg.x = float(dist_output)
+                self.GoGoal = True
+            
+            else: # -------------------------------- Go to checkpoint -------------------------------- 
+                print('in go to next checkpoint mode')
+                self.current_state = 'Go forward'
+                
+                distance_error = local_checkpoint_dist_x #determine distance between robot and checkpoint
 
-                msg_twist = Twist()
-                msg_twist.linear = dist_msg
-                self.motor_publisher.publish(msg_twist)
-                self.first_iteration = True
+                local_goal_direction = np.arctan2(local_checkpoint_dist_y,local_checkpoint_dist_x)
+                theta_error = local_goal_direction - cur_angle_rad #determine distance between robot and checkpoint
+                theta_error = local_goal_direction
+
+                dist_output = self.dist_pid.measure(distance_error, curr_time) #PID for distance, approaching checkpoint
+                ang_output = self.ang_pid.measure(theta_error, curr_time) #PID for rotating 90 degrees, once reached checkpoint
+                
+                print(f"distance: {distance_error}\nangle: {theta_error}\nPIDdist: {dist_output}")
+                # go to goal state ----------------------------------------------------------
+                # if  theta_error > np.pi/180 * 5: # if the heading of the robot is greater than 5 degrees away from the goal direction
+                if theta_error > np.pi/180 * 2:
+                    # rotate robot 90 degrees ccw since its at checkpoint
+                    dist_msg = Vector3()
+                    dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
+                    ang_msg = Vector3()
+                    ang_msg.z = float(ang_output)# positive for turning ccw
+                    msg_twist = Twist()
+                    msg_twist.angular = ang_msg
+                    self.motor_publisher.publish(msg_twist)
+
+                    # elif local_goal_direction < -np.pi/180 * 5:
+                elif theta_error < -np.pi/180 * 2:
+                    dist_msg = Vector3()
+                    dist_msg.x, dist_msg.y  = float(0), float(0) # make sure linear velocity is zero
+                    ang_msg = Vector3()
+                    ang_msg.z = float(ang_output) # negative for turning ccw
+                    msg_twist = Twist()
+                    msg_twist.angular = ang_msg
+                    self.motor_publisher.publish(msg_twist)  
+
+                    #reached the checkpoint
+                elif distance_error < .025: # made it to checkpoint -> set vel = 0
+                    dist_msg = Vector3()
+                    dist_msg.x = float(0)
+                    dist_msg.y = float(0)
+                    msg_twist = Twist()
+                    msg_twist.linear = dist_msg
+                    self.motor_publisher.publish(msg_twist)
+
+                    # if self.first_iteration == True: # wait at checkpoint
+                    #stop at the checkpoint for 10 seconds
+                    print('Waiting at Checkpoint 5 seconds')
+                    time.sleep(2)
+                    # self.first_iteration = False
+
+                else: #if not at checkpoint -> move forward 
+                    # publish motor commands
+                    dist_msg = Vector3()
+                    dist_msg.x = float(dist_output)
+
+                    msg_twist = Twist()
+                    msg_twist.linear = dist_msg
+                    self.motor_publisher.publish(msg_twist)
+                    self.first_iteration = True
 
 
     def sign_callback(self, data):
