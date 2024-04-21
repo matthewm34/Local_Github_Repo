@@ -249,8 +249,8 @@ class GoToGoal(Node):
 
                     # if self.first_iteration == True: # wait at checkpoint
                     #stop at the checkpoint for 10 seconds
-                    print('Waiting at Checkpoint 5 seconds')
-                    time.sleep(2)
+                    print('Waiting at Checkpoint 1 seconds')
+                    time.sleep(1)
                     # self.first_iteration = False
 
                 else: #if not at checkpoint -> move forward 
