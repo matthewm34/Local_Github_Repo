@@ -143,12 +143,12 @@ class GoToGoal(Node):
         print(f'current position: {cur_pos_x}, {cur_pos_y}, {cur_angle_rad}')
 
 
-        if self.dist < 0.6:
+        if self.dist < 0.7:
             self.GoGoal = False
 
         euc_dist = np.linalg.norm([local_checkpoint_dist_x[0], local_checkpoint_dist_y[0]])
         print(euc_dist)
-        if euc_dist > 7.75:
+        if euc_dist > 7.9:
             self.GoGoal = True
 
         # ----------------------- IMAGE DETECTION STATE -----------------------
