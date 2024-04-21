@@ -143,7 +143,7 @@ class GoToGoal(Node):
         print(f'current position: {cur_pos_x}, {cur_pos_y}, {cur_angle_rad}')
 
 
-        if self.dist < 0.7:
+        if self.dist < 0.65:
             self.GoGoal = False
 
         euc_dist = np.linalg.norm([local_checkpoint_dist_x[0], local_checkpoint_dist_y[0]])
@@ -191,7 +191,7 @@ class GoToGoal(Node):
                 None    # command motors do not move, pause code
 
             print('Waiting at image detection 5 seconds')
-            time.sleep(5)
+            time.sleep(2)
 
             self.GoGoal = True
          

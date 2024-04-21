@@ -51,7 +51,7 @@ class LidarDetect(Node):
 
         angle_increment_deg = angle_increment * 180/np.pi
         self.lidar_deg_inc = angle_increment_deg
-        ind_window = int(np.floor(31.1 / angle_increment_deg))
+        ind_window = int(np.floor(10 / angle_increment_deg))
 
         # actual LIDAR data segmented
         lidar_left = lidar_range_data[ind_window:0:-1]
